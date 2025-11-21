@@ -10,6 +10,7 @@ local_s3/
 .vs_code/
 .vscode/
 flow.txt
+notebooks/*.csv
 
 # DVC
 # Ignore actual data, but keep DVC metadata tracked
