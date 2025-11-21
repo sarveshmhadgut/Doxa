@@ -1,25 +1,26 @@
-import sys
+import os
+import shutil
+from src.pipeline.training_pipeline import TrainPipeline
 
-REQUIRED_PYTHON = "python3"
+
+def remove_pycache(root_dir):
+    deleted_count = 0
+
+    for dirpath, dirnames, filenames in os.walk(root_dir, topdown=False):
+        if "__pycache__" in dirnames:
+            pycache_path = os.path.join(dirpath, "__pycache__")
+            try:
+                shutil.rmtree(pycache_path)
+                deleted_count += 1
+            except OSError as e:
+                print(f"Error removing {pycache_path}: {e}")
 
 
 def main():
-    system_major = sys.version_info.major
-    if REQUIRED_PYTHON == "python":
-        required_major = 2
-    elif REQUIRED_PYTHON == "python3":
-        required_major = 3
-    else:
-        raise ValueError("Unrecognized python interpreter: {}".format(
-            REQUIRED_PYTHON))
-
-    if system_major != required_major:
-        raise TypeError(
-            "This project requires Python {}. Found: Python {}".format(
-                required_major, sys.version))
-    else:
-        print(">>> Development environment passes all tests!")
+    pipeline = TrainPipeline()
+    pipeline.run_pipeline()
+    remove_pycache(os.getcwd())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,0 +1,17 @@
+# import os
+
+PIPELINE_NAME = ""
+DATA_DIRNAME: str = "data"
+
+# aws setup
+DVC_BUCKET_NAME: str = "DVC_BUCKET_NAME"
+DATASET_BUCKET_NAME: str = "DATASET_BUCKET_NAME"
+AWS_ACCESS_KEY_ID: str = "AWS_ACCESS_KEY_ID"
+AWS_SECRET_ACCESS_KEY: str = "AWS_SECRET_ACCESS_KEY"
+AWS_REGION: str = "AWS_DEFAULT_REGION"
+AWS_CSV_FILENAME: str = "sample.csv"
+
+# data ingestion
+DATA_INGESTION_DIRNAME: str = "raw"
+RAW_TRAIN_FILENAME: str = "raw_train.csv"
+RAW_TEST_FILENAME: str = "raw_test.csv"
