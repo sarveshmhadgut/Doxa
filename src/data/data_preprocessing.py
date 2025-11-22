@@ -184,39 +184,39 @@ class DataPreprocessing:
             logging.info("Preprocessing training and testing data...")
             features: List[str] = self.data_preprocessing_config.features
 
-            processed_train_data: pd.DataFrame = self._preprocess_data(
+            interim_train_data: pd.DataFrame = self._preprocess_data(
                 raw_train_data, features
             )
-            processed_test_data: pd.DataFrame = self._preprocess_data(
+            interim_test_data: pd.DataFrame = self._preprocess_data(
                 raw_test_data, features
             )
 
-            processed_train_filepath: str = (
-                self.data_preprocessing_config.processed_train_filepath
+            interim_train_filepath: str = (
+                self.data_preprocessing_config.interim_train_filepath
             )
-            processed_test_filepath: str = (
-                self.data_preprocessing_config.processed_test_filepath
+            interim_test_filepath: str = (
+                self.data_preprocessing_config.interim_test_filepath
             )
 
-            logging.info("Saving preprocessed data to data/processed directory...")
+            logging.info("Saving preprocessed data to data/interim directory...")
             save_df_as_csv(
-                df=processed_train_data,
-                filepath=processed_train_filepath,
+                df=interim_train_data,
+                filepath=interim_train_filepath,
                 index=False,
             )
             save_df_as_csv(
-                df=processed_test_data,
-                filepath=processed_test_filepath,
+                df=interim_test_data,
+                filepath=interim_test_filepath,
                 index=False,
             )
 
             data_preprocessing_artifacts = DataPreprocessingArtifacts(
-                processed_train_filepath=processed_train_filepath,
-                processed_test_filepath=processed_test_filepath,
+                interim_train_filepath=interim_train_filepath,
+                interim_test_filepath=interim_test_filepath,
             )
 
             logging.info(
-                f"Data preprocessing complete! Train path: {data_preprocessing_artifacts.processed_train_filepath}, Test path: {data_preprocessing_artifacts.processed_test_filepath}"
+                f"Data preprocessing complete! Train path: {data_preprocessing_artifacts.interim_train_filepath}, Test path: {data_preprocessing_artifacts.interim_test_filepath}"
             )
             logging.info("Data Preprocessing complete!")
 

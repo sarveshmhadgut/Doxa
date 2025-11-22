@@ -17,4 +17,4 @@ stages:
     params:
     - data_preprocessing.features
     outs:
-    - data/processed
+    - data/interim

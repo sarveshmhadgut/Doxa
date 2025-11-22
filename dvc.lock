@@ -27,15 +27,15 @@ stages:
       nfiles: 2
     - path: src/data/data_preprocessing.py
       hash: md5
-      md5: 0c9863f81e348a6b9a8f6e91eef4c4f0
-      size: 8868
+      md5: 64a941de251b93eee99cc04d53d56fef
+      size: 8834
     params:
       params.yaml:
         data_preprocessing.features:
         - review
     outs:
-    - path: data/processed
+    - path: data/interim
       hash: md5
-      md5: 13550ef12c72938c2f15442e1a93555a.dir
+      md5: 515160137ec99f00365a148f2f96d61f.dir
       size: 9964044
       nfiles: 2

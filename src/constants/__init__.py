@@ -17,6 +17,6 @@ RAW_TRAIN_FILENAME: str = "raw_train.csv"
 RAW_TEST_FILENAME: str = "raw_test.csv"
 
 # data preprocessing
-PROCESSED_DATA_DIRNAME: str = "processed"
-PROCESSED_TRAIN_FILENAME: str = "processed_train.csv"
-PROCESSED_TEST_FILENAME: str = "processed_test.csv"
+INTERIM_DATA_DIRNAME: str = "interim"
+INTERIM_TRAIN_FILENAME: str = "interim_train.csv"
+INTERIM_TEST_FILENAME: str = "interim_test.csv"

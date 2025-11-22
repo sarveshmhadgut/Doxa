@@ -21,9 +21,9 @@ class DataPreprocessingArtifacts:
     Artifact object produced by the data preprocessing step.
 
     Attributes:
-        processed_train_filepath (str): Local path to the preprocessed training CSV.
-        processed_test_filepath (str): Local path to the preprocessed testing CSV.
+        interim_train_filepath (str): Local path to the preprocessed training CSV.
+        interim_test_filepath (str): Local path to the preprocessed testing CSV.
     """
 
-    processed_train_filepath: str
-    processed_test_filepath: str
+    interim_train_filepath: str
+    interim_test_filepath: str
