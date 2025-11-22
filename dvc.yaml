@@ -16,5 +16,19 @@ stages:
     - src/data/data_preprocessing.py
     params:
     - data_preprocessing.features
+    - data_preprocessing.target
     outs:
     - data/interim
+
+  feature_engineering:
+    cmd: uv run src/features/feature_engineering.py
+    deps:
+    - data/interim
+    - src/features/feature_engineering.py
+    params:
+    - data_preprocessing.target
+    - feature_engineering.max_features
+    - feature_engineering.feature
+    outs:
+    - data/processed
+    - models/vectorizer.pkl

@@ -5,8 +5,8 @@ stages:
     deps:
     - path: src/data/data_ingestion.py
       hash: md5
-      md5: 2857e8138937b04ba6c2f953b8b794c5
-      size: 8532
+      md5: f7d898360d7a7ce8856da10f7cba7fc7
+      size: 8577
     params:
       params.yaml:
         data_ingestion.random_state: 42
@@ -27,15 +27,43 @@ stages:
       nfiles: 2
     - path: src/data/data_preprocessing.py
       hash: md5
-      md5: 64a941de251b93eee99cc04d53d56fef
-      size: 8834
+      md5: cf38c3c1e22b9eab8de5c4b04ac73c0e
+      size: 9184
     params:
       params.yaml:
         data_preprocessing.features:
         - review
+        data_preprocessing.target: sentiment
     outs:
     - path: data/interim
       hash: md5
-      md5: 515160137ec99f00365a148f2f96d61f.dir
-      size: 9964044
+      md5: cf7f1bcf9fce39ff37d7c1dc9006ae86.dir
+      size: 9880233
       nfiles: 2
+  feature_engineering:
+    cmd: uv run src/features/feature_engineering.py
+    deps:
+    - path: data/interim
+      hash: md5
+      md5: cf7f1bcf9fce39ff37d7c1dc9006ae86.dir
+      size: 9880233
+      nfiles: 2
+    - path: src/features/feature_engineering.py
+      hash: md5
+      md5: 881e4b0c8321e0cc77d09f3d77f93eb8
+      size: 9475
+    params:
+      params.yaml:
+        data_preprocessing.target: sentiment
+        feature_engineering.feature: review
+        feature_engineering.max_features: 1000
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 4d7cfad61fce48d866eddf9f1ce2cb32.dir
+      size: 58430063
+      nfiles: 2
+    - path: models/vectorizer.pkl
+      hash: md5
+      md5: 769ded0a6f2f4980aabe90ba39d181f1
+      size: 36464

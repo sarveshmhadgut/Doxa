@@ -54,7 +54,8 @@ class DataPreprocessing:
 
                 self.data_preprocessing_config: DataPreprocessingConfig = (
                     DataPreprocessingConfig(
-                        features=list(data_preprocessing_params["features"])
+                        features=list(data_preprocessing_params["features"]),
+                        target=str(data_preprocessing_params["target"]),
                     )
                 )
             else:
@@ -118,7 +119,9 @@ class DataPreprocessing:
         except Exception:
             return ""
 
-    def _preprocess_data(self, df: pd.DataFrame, features: List[str]) -> pd.DataFrame:
+    def _preprocess_data(
+        self, df: pd.DataFrame, features: List[str], target: str
+    ) -> pd.DataFrame:
         """
         Apply text preprocessing to the specified feature columns in a DataFrame.
 
@@ -150,6 +153,9 @@ class DataPreprocessing:
                         df_processed[feature].astype(str).apply(self._preprocess_text)
                     )
 
+            df_processed[target] = df_processed[target].map(
+                {"negative": 0, "positive": 1}
+            )
             return df_processed
 
         except Exception as e:
@@ -183,12 +189,13 @@ class DataPreprocessing:
 
             logging.info("Preprocessing training and testing data...")
             features: List[str] = self.data_preprocessing_config.features
+            target: str = self.data_preprocessing_config.target
 
             interim_train_data: pd.DataFrame = self._preprocess_data(
-                raw_train_data, features
+                raw_train_data, features, target=target
             )
             interim_test_data: pd.DataFrame = self._preprocess_data(
-                raw_test_data, features
+                raw_test_data, features, target=target
             )
 
             interim_train_filepath: str = (
@@ -216,7 +223,7 @@ class DataPreprocessing:
             )
 
             logging.info(
-                f"Data preprocessing complete! Train path: {data_preprocessing_artifacts.interim_train_filepath}, Test path: {data_preprocessing_artifacts.interim_test_filepath}"
+                f"Interim train filepath: {data_preprocessing_artifacts.interim_train_filepath}, Interim test filepath: {data_preprocessing_artifacts.interim_test_filepath}"
             )
             logging.info("Data Preprocessing complete!")
 
@@ -238,10 +245,10 @@ def main() -> DataPreprocessingArtifacts:
     """
     try:
         data_preprocessing = DataPreprocessing()
-        artifacts: DataPreprocessingArtifacts = (
+        data_preprocessing_artifacts: DataPreprocessingArtifacts = (
             data_preprocessing.initiate_data_preprocessing()
         )
-        return artifacts
+        return data_preprocessing_artifacts
 
     except MyException:
         raise

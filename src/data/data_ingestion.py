@@ -211,8 +211,10 @@ class DataIngestion:
             )
 
             logging.info(
-                f"Data ingestion complete! Train path: {data_ingestion_artifacts.raw_train_filepath}, Test path: {data_ingestion_artifacts.raw_test_filepath}",
+                f"Raw train filepath: {data_ingestion_artifacts.raw_train_filepath}, Raw test filepath: {data_ingestion_artifacts.raw_test_filepath}",
             )
+
+            logging.info("Data Ingestion complete!")
             return data_ingestion_artifacts
 
         except Exception as e:

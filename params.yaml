@@ -4,3 +4,8 @@ data_ingestion:
 
 data_preprocessing:
   features: [ "review" ]
+  target: "sentiment"
+
+feature_engineering:
+  max_features: 1000
+  feature: "review"

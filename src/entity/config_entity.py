@@ -11,6 +11,11 @@ from src.constants import (
     INTERIM_DATA_DIRNAME,
     INTERIM_TRAIN_FILENAME,
     INTERIM_TEST_FILENAME,
+    PROCESSED_DATA_DIRNAME,
+    PROCESSED_TRAIN_FILENAME,
+    PROCESSED_TEST_FILENAME,
+    MODELS_DIRNAME,
+    VECTORIZER_FILENAME,
 )
 
 
@@ -26,6 +31,7 @@ class TrainingPipelineConfig:
 
     pipeline_name: str = field(default=PIPELINE_NAME)
     data_dirpath: str = field(default_factory=lambda: os.path.join(DATA_DIRNAME))
+    models_dirpath: str = field(default_factory=lambda: os.path.join(MODELS_DIRNAME))
 
 
 training_pipeline_config: Final[TrainingPipelineConfig] = TrainingPipelineConfig()
@@ -94,6 +100,7 @@ class DataPreprocessingConfig:
     interim_test_filepath: str = field(init=False)
 
     features: list[str]
+    target: str
 
     def __post_init__(self) -> None:
         """
@@ -124,4 +131,75 @@ class DataPreprocessingConfig:
         self.interim_test_filepath = os.path.join(
             self.interim_data_dirpath,
             INTERIM_TEST_FILENAME,
+        )
+
+
+@dataclass
+class FeatureEngineeringConfig:
+    """
+    Configuration for the feature engineering / vectorization stage.
+
+    Attributes:
+        interim_train_filepath (str): Path to the interim training CSV (preprocessed text).
+        interim_test_filepath (str): Path to the interim testing CSV (preprocessed text).
+        processed_data_dirpath (str): Directory where final processed train/test feature
+            matrices metadata (e.g., CSVs or references) will be stored.
+        processed_train_filepath (str): File path for the processed training data
+            (features + target) representation.
+        processed_test_filepath (str): File path for the processed testing data
+            (features + target) representation.
+        vectorizer_filepath (str): File path for the saved vectorizer object.
+        max_features (int): Maximum number of features for the vectorizer
+            (e.g., max vocabulary size for bag-of-words).
+        feature (str): Name of the single text feature column to vectorize.
+        target (str): Name of the target column.
+    """
+
+    interim_train_filepath: str = field(init=False)
+    interim_test_filepath: str = field(init=False)
+
+    processed_data_dirpath: str = field(init=False)
+    processed_train_filepath: str = field(init=False)
+    processed_test_filepath: str = field(init=False)
+
+    vectorizer_filepath: str = field(init=False)
+
+    max_features: int
+    feature: str
+    target: str
+
+    def __post_init__(self) -> None:
+        """
+        Initialize file system paths for interim inputs, processed outputs,
+        and the vectorizer object, and ensure necessary directories exist.
+        """
+        self.interim_train_filepath = os.path.join(
+            training_pipeline_config.data_dirpath,
+            INTERIM_DATA_DIRNAME,
+            INTERIM_TRAIN_FILENAME,
+        )
+        self.interim_test_filepath = os.path.join(
+            training_pipeline_config.data_dirpath,
+            INTERIM_DATA_DIRNAME,
+            INTERIM_TEST_FILENAME,
+        )
+
+        self.processed_data_dirpath = os.path.join(
+            training_pipeline_config.data_dirpath,
+            PROCESSED_DATA_DIRNAME,
+        )
+        os.makedirs(self.processed_data_dirpath, exist_ok=True)
+
+        self.processed_train_filepath = os.path.join(
+            self.processed_data_dirpath,
+            PROCESSED_TRAIN_FILENAME,
+        )
+        self.processed_test_filepath = os.path.join(
+            self.processed_data_dirpath,
+            PROCESSED_TEST_FILENAME,
+        )
+
+        self.vectorizer_filepath = os.path.join(
+            training_pipeline_config.models_dirpath,
+            VECTORIZER_FILENAME,
         )

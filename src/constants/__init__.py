@@ -1,7 +1,6 @@
-# import os
-
 PIPELINE_NAME = ""
 DATA_DIRNAME: str = "data"
+MODELS_DIRNAME: str = "models"
 
 # aws setup
 DVC_BUCKET_NAME: str = "DVC_BUCKET_NAME"
@@ -20,3 +19,9 @@ RAW_TEST_FILENAME: str = "raw_test.csv"
 INTERIM_DATA_DIRNAME: str = "interim"
 INTERIM_TRAIN_FILENAME: str = "interim_train.csv"
 INTERIM_TEST_FILENAME: str = "interim_test.csv"
+
+# feature engineering
+PROCESSED_DATA_DIRNAME: str = "processed"
+PROCESSED_TRAIN_FILENAME: str = "processed_train.csv"
+PROCESSED_TEST_FILENAME: str = "processed_test.csv"
+VECTORIZER_FILENAME: str = "vectorizer.pkl"

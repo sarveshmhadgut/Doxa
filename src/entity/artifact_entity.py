@@ -27,3 +27,22 @@ class DataPreprocessingArtifacts:
 
     interim_train_filepath: str
     interim_test_filepath: str
+
+
+@dataclass
+class FeatureEngineeringArtifacts:
+    """
+    Artifact object produced by the feature engineering / vectorization step.
+
+    Attributes:
+        processed_train_filepath (str): Local path to the processed training data
+            (typically feature matrix + target, or a serialized representation).
+        processed_test_filepath (str): Local path to the processed testing data
+            (typically feature matrix + target, or a serialized representation).
+        vectorizer_filepath (str): Local path to the persisted vectorizer object
+            (e.g., CountVectorizer, TfidfVectorizer).
+    """
+
+    processed_train_filepath: str
+    processed_test_filepath: str
+    vectorizer_filepath: str
