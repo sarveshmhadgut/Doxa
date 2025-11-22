@@ -1,5 +1,6 @@
 import sys
 import pandas as pd
+from halo import Halo
 from numpy import ndarray
 from src.logger import logging
 from typing import Optional, Tuple
@@ -20,8 +21,7 @@ class FeatureEngineering:
     Handles feature engineering / vectorization for the sentiment analysis project.
 
     Responsibilities:
-        - Load feature engineering configuration (feature, target, max_features)
-          from params.yaml if not provided.
+        - Load feature engineering configuration (feature, target, max_features) from params.yaml if not provided.
         - Apply TF-IDF vectorization to the configured text feature.
         - Persist processed train/test datasets and the fitted vectorizer.
         - Return artifact metadata with filepaths for downstream stages.
@@ -89,20 +89,31 @@ class FeatureEngineering:
             MyException: If feature engineering fails.
         """
         try:
-            logging.info(
-                f"Applying TF-IDF on feature='{feature}' with max_features={max_features}"
-            )
-
             interim_X_train: ndarray = train_df[feature].values
             interim_y_train: ndarray = train_df[target].values
 
             interim_X_test: ndarray = test_df[feature].values
             interim_y_test: ndarray = test_df[target].values
 
-            vectorizer: TfidfVectorizer = TfidfVectorizer(max_features=max_features)
+            vectorizer: TfidfVectorizer = TfidfVectorizer(
+                max_features=max_features,
+                ngram_range=(1, 2),
+                min_df=2,
+                max_df=0.95,
+                sublinear_tf=True,
+            )
 
-            processed_X_train = vectorizer.fit_transform(interim_X_train)
-            processed_X_test = vectorizer.transform(interim_X_test)
+            with Halo(
+                text="Applying TF-IDF on interim training data...",
+                spinner="dots",
+            ):
+                processed_X_train = vectorizer.fit_transform(interim_X_train)
+
+            with Halo(
+                text="Applying TF-IDF on interim testing data...",
+                spinner="dots",
+            ):
+                processed_X_test = vectorizer.transform(interim_X_test)
 
             feature_names = [f"feature_{i}" for i in range(processed_X_train.shape[1])]
 
@@ -166,7 +177,7 @@ class FeatureEngineering:
                 self.feature_engineering_config.interim_test_filepath
             )
 
-            logging.info("Reading interim training & testing data...")
+            logging.info("Fetching interim training & testing data...")
             interim_train_df: pd.DataFrame = read_csv_file(
                 filepath=interim_train_filepath
             )
@@ -190,25 +201,34 @@ class FeatureEngineering:
                 self.feature_engineering_config.processed_test_filepath
             )
 
-            logging.info("Saving TF-IDF vectorizer...")
+            logging.info("Saving processed training & testing data...")
+            with Halo(
+                text="Saving processed training data...",
+                spinner="dots",
+            ):
+                save_df_as_csv(
+                    df=processed_train_df,
+                    filepath=processed_train_filepath,
+                    index=False,
+                )
+
+            with Halo(
+                text="Saving processed training data...",
+                spinner="dots",
+            ):
+                save_df_as_csv(
+                    df=processed_test_df,
+                    filepath=processed_test_filepath,
+                    index=False,
+                )
+
+            logging.info("Dumping TF-IDF vectorizer...")
             vectorizer_filepath: str = (
                 self.feature_engineering_config.vectorizer_filepath
             )
             self._save_vectorizer(
                 vectorizer=vectorizer,
                 filepath=vectorizer_filepath,
-            )
-
-            logging.info("Saving processed training & testing datasets...")
-            save_df_as_csv(
-                df=processed_train_df,
-                filepath=processed_train_filepath,
-                index=False,
-            )
-            save_df_as_csv(
-                df=processed_test_df,
-                filepath=processed_test_filepath,
-                index=False,
             )
 
             feature_engineering_artifacts: FeatureEngineeringArtifacts = (
@@ -241,9 +261,9 @@ def main() -> FeatureEngineeringArtifacts:
         MyException: If the feature engineering pipeline fails.
     """
     try:
-        feature_engineering = FeatureEngineering()
+        feature_engineer = FeatureEngineering()
         feature_engineering_artifacts: FeatureEngineeringArtifacts = (
-            feature_engineering.initiate_feature_engineering()
+            feature_engineer.initiate_feature_engineering()
         )
         return feature_engineering_artifacts
 

@@ -2,7 +2,6 @@ import sys
 import boto3
 import pandas as pd
 from io import StringIO
-from src.logger import logging
 from src.exception import MyException
 
 
@@ -56,14 +55,11 @@ class S3Operations:
             MyException: If the S3 read or CSV parsing fails.
         """
         try:
-            logging.info("Fetching file from S3 bucket...")
-
             obj = self.s3_client.get_object(Bucket=self.bucket_name, Key=file_key)
             body_bytes: bytes = obj["Body"].read()
             csv_text: str = body_bytes.decode("utf-8")
 
             df: pd.DataFrame = pd.read_csv(StringIO(csv_text))
-            logging.info("Fetched and loaded CSV from S3 ")
 
             return df
 

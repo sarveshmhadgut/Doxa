@@ -16,6 +16,7 @@ from src.constants import (
     PROCESSED_TEST_FILENAME,
     MODELS_DIRNAME,
     VECTORIZER_FILENAME,
+    MODEL_FILENAME,
 )
 
 
@@ -202,4 +203,45 @@ class FeatureEngineeringConfig:
         self.vectorizer_filepath = os.path.join(
             training_pipeline_config.models_dirpath,
             VECTORIZER_FILENAME,
+        )
+
+
+@dataclass
+class ModelTrainingConfig:
+    """
+    Configuration for the model training stage.
+
+    Attributes:
+        processed_train_filepath (str): Path to the processed training CSV produced
+            by the feature engineering stage.
+        model_filepath (str): Path where the trained model will be saved.
+        target (str): Name of the target column used for training.
+        c (float): Inverse regularization strength (C parameter) for Logistic Regression.
+        solver (str): Solver to use in Logistic Regression.
+        penalty (str): Norm used in the penalization.
+        max_iter (int): Maximum number of iterations for the solver.
+    """
+
+    processed_train_filepath: str = field(init=False)
+    model_filepath: str = field(init=False)
+
+    target: str
+    c: float
+    solver: str
+    penalty: str
+    max_iter: int
+
+    def __post_init__(self) -> None:
+        """
+        Initialize file system paths for processed training data and the model file.
+        """
+        self.processed_train_filepath = os.path.join(
+            training_pipeline_config.data_dirpath,
+            PROCESSED_DATA_DIRNAME,
+            PROCESSED_TRAIN_FILENAME,
+        )
+
+        self.model_filepath = os.path.join(
+            training_pipeline_config.models_dirpath,
+            MODEL_FILENAME,
         )

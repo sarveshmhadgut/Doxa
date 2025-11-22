@@ -1,6 +1,7 @@
 import os
 import sys
 import pandas as pd
+from halo import Halo
 from src.logger import logging
 from dotenv import load_dotenv
 from typing import Optional, Tuple
@@ -172,8 +173,12 @@ class DataIngestion:
                 aws_region=aws_region,
             )
 
-            logging.info("Fetching dataset CSV from S3...")
-            df: pd.DataFrame = s3.fetch_csv_from_s3(file_key=AWS_CSV_FILENAME)
+            logging.info("Fetching dataset from S3...")
+            with Halo(
+                text="Fetching dataset from S3...",
+                spinner="dots",
+            ):
+                df: pd.DataFrame = s3.fetch_csv_from_s3(file_key=AWS_CSV_FILENAME)
 
             logging.info("Performing primitive preprocessing...")
             processed_df: pd.DataFrame = self._preprocess_data(df=df)
@@ -193,7 +198,7 @@ class DataIngestion:
                 stratify=stratify_series,
             )
 
-            logging.info("Saving training & testing data to data/raw directory...")
+            logging.info("Dumping training & testing data...")
             save_df_as_csv(
                 df=train_data,
                 filepath=self.data_ingestion_config.raw_train_filepath,
@@ -214,7 +219,7 @@ class DataIngestion:
                 f"Raw train filepath: {data_ingestion_artifacts.raw_train_filepath}, Raw test filepath: {data_ingestion_artifacts.raw_test_filepath}",
             )
 
-            logging.info("Data Ingestion complete!")
+            logging.info("Data Ingestion complete.")
             return data_ingestion_artifacts
 
         except Exception as e:
@@ -232,9 +237,9 @@ def main() -> DataIngestionArtifacts:
         MyException: If the data ingestion pipeline fails.
     """
     try:
-        data_ingestion = DataIngestion()
+        data_ingestor = DataIngestion()
         data_ingestion_artifacts: DataIngestionArtifacts = (
-            data_ingestion.initiate_data_ingestion()
+            data_ingestor.initiate_data_ingestion()
         )
         return data_ingestion_artifacts
 

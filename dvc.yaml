@@ -32,3 +32,17 @@ stages:
     outs:
     - data/processed
     - models/vectorizer.pkl
+
+  model_training:
+    cmd: uv run src/model/model_training.py
+    deps:
+    - data/processed
+    - src/model/model_training.py
+    params:
+    - model_training.target
+    - model_training.c
+    - model_training.solver
+    - model_training.penalty
+    - model_training.max_iter
+    outs:
+    - models/model.pkl

@@ -25,3 +25,6 @@ PROCESSED_DATA_DIRNAME: str = "processed"
 PROCESSED_TRAIN_FILENAME: str = "processed_train.csv"
 PROCESSED_TEST_FILENAME: str = "processed_test.csv"
 VECTORIZER_FILENAME: str = "vectorizer.pkl"
+
+# model training
+MODEL_FILENAME: str = "model.pkl"

@@ -5,8 +5,8 @@ stages:
     deps:
     - path: src/data/data_ingestion.py
       hash: md5
-      md5: f7d898360d7a7ce8856da10f7cba7fc7
-      size: 8577
+      md5: 14e98f10b52635b5836396305a6cd974
+      size: 8698
     params:
       params.yaml:
         data_ingestion.random_state: 42
@@ -27,8 +27,8 @@ stages:
       nfiles: 2
     - path: src/data/data_preprocessing.py
       hash: md5
-      md5: cf38c3c1e22b9eab8de5c4b04ac73c0e
-      size: 9184
+      md5: fd52103ff5aa0749fe8379f3caf06117
+      size: 9183
     params:
       params.yaml:
         data_preprocessing.features:
@@ -50,8 +50,8 @@ stages:
       nfiles: 2
     - path: src/features/feature_engineering.py
       hash: md5
-      md5: 881e4b0c8321e0cc77d09f3d77f93eb8
-      size: 9475
+      md5: b0031ac6e98809bfcf88351d1e0c7361
+      size: 10085
     params:
       params.yaml:
         data_preprocessing.target: sentiment
@@ -60,10 +60,34 @@ stages:
     outs:
     - path: data/processed
       hash: md5
-      md5: 4d7cfad61fce48d866eddf9f1ce2cb32.dir
-      size: 58430063
+      md5: 2afd6bfb414546774119c0408c9a3518.dir
+      size: 58480650
       nfiles: 2
     - path: models/vectorizer.pkl
       hash: md5
-      md5: 769ded0a6f2f4980aabe90ba39d181f1
-      size: 36464
+      md5: e59bccb3adbe5bcd7b2d4779f711b4f8
+      size: 36633
+  model_training:
+    cmd: uv run src/model/model_training.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 2afd6bfb414546774119c0408c9a3518.dir
+      size: 58480650
+      nfiles: 2
+    - path: src/model/model_training.py
+      hash: md5
+      md5: 608566b1d43501b0f2bff1ce7d978a44
+      size: 6808
+    params:
+      params.yaml:
+        model_training.c: 10
+        model_training.max_iter: 1000
+        model_training.penalty: l2
+        model_training.solver: liblinear
+        model_training.target: label
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: b1dcfdc05f3be259fd22d17503c5edd0
+      size: 22766

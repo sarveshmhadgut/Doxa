@@ -9,3 +9,10 @@ data_preprocessing:
 feature_engineering:
   max_features: 1000
   feature: "review"
+
+model_training:
+  target: "label"
+  c: 10
+  solver: "liblinear"
+  penalty: "l2"
+  max_iter: 1000

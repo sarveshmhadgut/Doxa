@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import shutil
 from yaml import safe_load
 from typing import Any, Dict
 from datetime import datetime
@@ -202,6 +203,37 @@ def save_as_json(data: Dict[str, Any], filepath: str, **kwargs: Any) -> None:
 
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(data, f, **kwargs)
+
+    except Exception as e:
+        raise MyException(e, sys) from e
+
+
+def remove_pycache(root_dir: str) -> int:
+    """
+    Recursively remove all `__pycache__` directories under a given root.
+
+    Args:
+        root_dir (str): Root directory to search for `__pycache__` folders.
+
+    Returns:
+        int: Number of `__pycache__` directories successfully deleted.
+
+    Raises:
+        MyException: If a non-recoverable error occurs while walking the directory tree.
+    """
+    try:
+        deleted_count: int = 0
+
+        for dirpath, dirnames, _ in os.walk(root_dir, topdown=False):
+            if "__pycache__" in dirnames:
+                pycache_path = os.path.join(dirpath, "__pycache__")
+                try:
+                    shutil.rmtree(pycache_path)
+                    deleted_count += 1
+                except OSError as e:
+                    raise MyException(e, sys) from e
+
+        return deleted_count
 
     except Exception as e:
         raise MyException(e, sys) from e

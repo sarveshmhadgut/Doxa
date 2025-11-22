@@ -182,7 +182,7 @@ class DataPreprocessing:
             raw_train_filepath: str = self.data_preprocessing_config.raw_train_filepath
             raw_test_filepath: str = self.data_preprocessing_config.raw_test_filepath
 
-            logging.info("Reading raw training & testing data...")
+            logging.info("Fetching raw training & testing data...")
 
             raw_train_data: pd.DataFrame = read_csv_file(filepath=raw_train_filepath)
             raw_test_data: pd.DataFrame = read_csv_file(filepath=raw_test_filepath)
@@ -225,7 +225,7 @@ class DataPreprocessing:
             logging.info(
                 f"Interim train filepath: {data_preprocessing_artifacts.interim_train_filepath}, Interim test filepath: {data_preprocessing_artifacts.interim_test_filepath}"
             )
-            logging.info("Data Preprocessing complete!")
+            logging.info("Data Preprocessing complete.")
 
             return data_preprocessing_artifacts
 
@@ -244,9 +244,9 @@ def main() -> DataPreprocessingArtifacts:
         MyException: If data preprocessing fails.
     """
     try:
-        data_preprocessing = DataPreprocessing()
+        data_preprocessor = DataPreprocessing()
         data_preprocessing_artifacts: DataPreprocessingArtifacts = (
-            data_preprocessing.initiate_data_preprocessing()
+            data_preprocessor.initiate_data_preprocessing()
         )
         return data_preprocessing_artifacts
 

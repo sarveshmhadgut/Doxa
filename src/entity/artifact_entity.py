@@ -46,3 +46,16 @@ class FeatureEngineeringArtifacts:
     processed_train_filepath: str
     processed_test_filepath: str
     vectorizer_filepath: str
+
+
+@dataclass
+class ModelTrainingArtifacts:
+    """
+    Artifact object produced by the model training step.
+
+    Attributes:
+        model_filepath (str): Local path to the persisted trained model file
+            (e.g., pickled LogisticRegression instance).
+    """
+
+    model_filepath: str
