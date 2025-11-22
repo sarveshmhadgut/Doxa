@@ -8,3 +8,13 @@ stages:
     - data_ingestion.random_state
     outs:
     - data/raw
+
+  data_preprocessing:
+    cmd: uv run src/data/data_preprocessing.py
+    deps:
+    - data/raw
+    - src/data/data_preprocessing.py
+    params:
+    - data_preprocessing.features
+    outs:
+    - data/processed

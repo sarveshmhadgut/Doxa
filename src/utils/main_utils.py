@@ -66,7 +66,7 @@ def save_df_as_csv(df: DataFrame, filepath: str, **kwargs: Any) -> None:
         raise MyException(e, sys) from e
 
 
-def read_yaml_file(filepath: str) -> Any:
+def read_yaml_file(filepath: str = "params.yaml") -> Any:
     """
     Read and parse a YAML file safely.
 

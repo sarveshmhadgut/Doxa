@@ -5,8 +5,8 @@ stages:
     deps:
     - path: src/data/data_ingestion.py
       hash: md5
-      md5: b130e0eedb44120145bc9daac67934e8
-      size: 8540
+      md5: 2857e8138937b04ba6c2f953b8b794c5
+      size: 8532
     params:
       params.yaml:
         data_ingestion.random_state: 42
@@ -16,4 +16,26 @@ stages:
       hash: md5
       md5: af681a27bb74ead2f63fad6aac0cc43c.dir
       size: 15870615
+      nfiles: 2
+  data_preprocessing:
+    cmd: uv run src/data/data_preprocessing.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: af681a27bb74ead2f63fad6aac0cc43c.dir
+      size: 15870615
+      nfiles: 2
+    - path: src/data/data_preprocessing.py
+      hash: md5
+      md5: 0c9863f81e348a6b9a8f6e91eef4c4f0
+      size: 8868
+    params:
+      params.yaml:
+        data_preprocessing.features:
+        - review
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 13550ef12c72938c2f15442e1a93555a.dir
+      size: 9964044
       nfiles: 2

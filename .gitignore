@@ -11,10 +11,10 @@ local_s3/
 .vscode/
 flow.txt
 notebooks/*.csv
-
 # DVC
 # Ignore actual data, but keep DVC metadata tracked
-data/
+/data
+!/src/data
 
 # C extensions
 *.so

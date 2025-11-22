@@ -15,3 +15,8 @@ AWS_CSV_FILENAME: str = "sample.csv"
 DATA_INGESTION_DIRNAME: str = "raw"
 RAW_TRAIN_FILENAME: str = "raw_train.csv"
 RAW_TEST_FILENAME: str = "raw_test.csv"
+
+# data preprocessing
+PROCESSED_DATA_DIRNAME: str = "processed"
+PROCESSED_TRAIN_FILENAME: str = "processed_train.csv"
+PROCESSED_TEST_FILENAME: str = "processed_test.csv"
