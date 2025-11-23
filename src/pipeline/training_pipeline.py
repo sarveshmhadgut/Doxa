@@ -1,23 +1,25 @@
 import os
 import sys
-from src.logger import logging
 from src.exception import MyException
 from src.utils.main_utils import read_yaml_file
 from src.data.data_ingestion import DataIngestion
 from src.data.data_preprocessing import DataPreprocessing
 from src.features.feature_engineering import FeatureEngineering
 from src.model.model_training import ModelTraining
+from src.model.model_evaluation import ModelEvaluation
 from src.entity.config_entity import (
     DataIngestionConfig,
     DataPreprocessingConfig,
     FeatureEngineeringConfig,
     ModelTrainingConfig,
+    ModelEvaluationConfig,
 )
 from src.entity.artifact_entity import (
     DataIngestionArtifacts,
     DataPreprocessingArtifacts,
     FeatureEngineeringArtifacts,
     ModelTrainingArtifacts,
+    ModelEvaluationArtifacts,
 )
 
 terminal_width: int = os.get_terminal_size().columns if os.isatty(1) else 80
@@ -68,6 +70,10 @@ class TrainPipeline:
                 solver=str(params["model_training"]["solver"]),
                 penalty=str(params["model_training"]["penalty"]),
                 max_iter=int(params["model_training"]["max_iter"]),
+            )
+
+            self.model_evaluation_config: ModelEvaluationConfig = ModelEvaluationConfig(
+                target=str(params["model_training"]["target"]),
             )
 
         except Exception as e:
@@ -156,61 +162,75 @@ class TrainPipeline:
         except Exception as e:
             raise MyException(e, sys) from e
 
+    def start_model_evaluation(self) -> ModelEvaluationArtifacts:
+        """
+        Run the model evaluation stage of the pipeline.
+
+        Returns:
+            ModelEvaluationArtifacts: Paths to the metrics and model info reports.
+        """
+        try:
+            model_evaluator: ModelEvaluation = ModelEvaluation(
+                model_evaluation_config=self.model_evaluation_config
+            )
+
+            model_evaluation_artifacts: ModelEvaluationArtifacts = (
+                model_evaluator.initiate_model_evaluation()
+            )
+            return model_evaluation_artifacts
+
+        except Exception as e:
+            raise MyException(e, sys) from e
+
     def run_pipeline(self) -> None:
         """
         Execute the full training pipeline in sequence.
         """
         try:
             print("=" * terminal_width)
-            logging.info("Executing training pipeline...")
-            print("Executing training pipeline...")
+            print(f"{'Training Pipeline':^{terminal_width}}")
             print("-" * terminal_width)
 
             # Stage 1: Data Ingestion
-            logging.info("Executing Data Ingestion stage...")
-            print("Stage 1: Data Ingestion")
-            data_ingestion_artifacts = self.start_data_ingestion()
-            print(f"Ingested train: {data_ingestion_artifacts.raw_train_filepath}")
-            print(f"Ingested test: {data_ingestion_artifacts.raw_test_filepath}")
+            print(f"{'Stage 1: Data Ingestion':^{terminal_width}}")
+            data_ingestion_artifacts: DataIngestionArtifacts = (
+                self.start_data_ingestion()
+            )
             print("-" * terminal_width)
 
             # Stage 2: Data Preprocessing
-            logging.info("Executing Data Preprocessing stage...")
-            print("Stage 2: Data Preprocessing")
-            data_preprocessing_artifacts = self.start_data_preprocessing()
-            print(
-                f"Interim train: {data_preprocessing_artifacts.interim_train_filepath}"
+            print(f"{'Stage 2: Data Preprocessing':^{terminal_width}}")
+            data_preprocessing_artifacts: DataPreprocessingArtifacts = (
+                self.start_data_preprocessing()
             )
-            print(f"Interim test: {data_preprocessing_artifacts.interim_test_filepath}")
             print("-" * terminal_width)
 
             # Stage 3: Feature Engineering
-            logging.info("Executing Feature Engineering stage...")
-            print("Stage 3: Feature Engineering")
-            feature_engineering_artifacts = self.start_feature_engineering()
-            print(
-                f"Processed train: {feature_engineering_artifacts.processed_train_filepath}"
+            print(f"{'Stage 3: Feature Engineering':^{terminal_width}}")
+            feature_engineering_artifacts: FeatureEngineeringArtifacts = (
+                self.start_feature_engineering()
             )
-            print(
-                f"Processed test: {feature_engineering_artifacts.processed_test_filepath}"
-            )
-            print(f"Vectorizer: {feature_engineering_artifacts.vectorizer_filepath}")
             print("-" * terminal_width)
 
             # Stage 4: Model Training
-            logging.info("Executing Model Training stage...")
-            print("Stage 4: Model Training")
-            model_training_artifacts = self.start_model_training()
-            print(f"Model saved at: {model_training_artifacts.model_filepath}")
+            print(f"{'Stage 4: Model Training':^{terminal_width}}")
+            model_training_artifacts: ModelTrainingArtifacts = (
+                self.start_model_training()
+            )
             print("-" * terminal_width)
 
-            logging.info("Training pipeline executed successfully.")
-            print("Training pipeline completed successfully.")
+            # Stage 5: Model Evaluation
+            print(f"{'Stage 5: Model Evaluation':^{terminal_width}}")
+            model_evaluation_artifacts: ModelEvaluationArtifacts = (
+                self.start_model_evaluation()
+            )
+            print("-" * terminal_width)
+
+            print(f"{'Training pipeline completed.':^{terminal_width}}")
             print("=" * terminal_width)
 
         except Exception as e:
-            logging.exception("Training pipeline execution failed")
             print("=" * terminal_width)
-            print("Training pipeline failed!")
+            print(f"{'Training pipeline failed!.':^{terminal_width}}")
             print("=" * terminal_width)
             raise MyException(e, sys) from e

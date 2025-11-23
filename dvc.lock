@@ -5,8 +5,8 @@ stages:
     deps:
     - path: src/data/data_ingestion.py
       hash: md5
-      md5: 14e98f10b52635b5836396305a6cd974
-      size: 8698
+      md5: ca630f97287824e53c3f1412747ac65b
+      size: 8709
     params:
       params.yaml:
         data_ingestion.random_state: 42
@@ -27,8 +27,8 @@ stages:
       nfiles: 2
     - path: src/data/data_preprocessing.py
       hash: md5
-      md5: fd52103ff5aa0749fe8379f3caf06117
-      size: 9183
+      md5: f298eec34fb640cc64c778fc87c8b36c
+      size: 9299
     params:
       params.yaml:
         data_preprocessing.features:
@@ -50,8 +50,8 @@ stages:
       nfiles: 2
     - path: src/features/feature_engineering.py
       hash: md5
-      md5: b0031ac6e98809bfcf88351d1e0c7361
-      size: 10085
+      md5: 2f94ac14c35dd1447d6c95aea1563e4c
+      size: 9602
     params:
       params.yaml:
         data_preprocessing.target: sentiment
@@ -65,7 +65,7 @@ stages:
       nfiles: 2
     - path: models/vectorizer.pkl
       hash: md5
-      md5: e59bccb3adbe5bcd7b2d4779f711b4f8
+      md5: dde68208eb9e95988fea18316e983420
       size: 36633
   model_training:
     cmd: uv run src/model/model_training.py
@@ -77,8 +77,8 @@ stages:
       nfiles: 2
     - path: src/model/model_training.py
       hash: md5
-      md5: 608566b1d43501b0f2bff1ce7d978a44
-      size: 6808
+      md5: a084701bbb51a45edaad187c106c4db6
+      size: 6304
     params:
       params.yaml:
         model_training.c: 10
@@ -91,3 +91,27 @@ stages:
       hash: md5
       md5: b1dcfdc05f3be259fd22d17503c5edd0
       size: 22766
+  model_evaluation:
+    cmd: uv run src/model/model_evaluation.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 2afd6bfb414546774119c0408c9a3518.dir
+      size: 58480650
+      nfiles: 2
+    - path: src/model/model_evaluation.py
+      hash: md5
+      md5: 052b007f8e5644dc70596628f6334aef
+      size: 9809
+    params:
+      params.yaml:
+        model_training.target: label
+    outs:
+    - path: reports/metrics.json
+      hash: md5
+      md5: 49c1d50bcce3ba67b60bd33562bd232c
+      size: 215
+    - path: reports/model_info.json
+      hash: md5
+      md5: d3a0353708005ca4e078520a596348f1
+      size: 90

@@ -1,6 +1,7 @@
 PIPELINE_NAME = ""
 DATA_DIRNAME: str = "data"
 MODELS_DIRNAME: str = "models"
+REPORTS_DIRNAME: str = "reports"
 
 # aws setup
 DVC_BUCKET_NAME: str = "DVC_BUCKET_NAME"
@@ -9,6 +10,11 @@ AWS_ACCESS_KEY_ID: str = "AWS_ACCESS_KEY_ID"
 AWS_SECRET_ACCESS_KEY: str = "AWS_SECRET_ACCESS_KEY"
 AWS_REGION: str = "AWS_DEFAULT_REGION"
 AWS_CSV_FILENAME: str = "sample.csv"
+
+# dagshub setup
+DAGSHUB_URI = "DAGSHUB_URI"
+DAGSHUB_REPO = "DAGSHUB_REPO"
+DAGSHUB_USERNAME = "DAGSHUB_USERNAME"
 
 # data ingestion
 DATA_INGESTION_DIRNAME: str = "raw"
@@ -28,3 +34,7 @@ VECTORIZER_FILENAME: str = "vectorizer.pkl"
 
 # model training
 MODEL_FILENAME: str = "model.pkl"
+
+# model evaluation
+METRICS_FILENAME: str = "metrics.json"
+MODEL_INFO_FILENAME: str = "model_info.json"

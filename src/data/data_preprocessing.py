@@ -6,16 +6,15 @@ import pandas as pd
 from halo import Halo
 from src.logger import logging
 from nltk.corpus import stopwords
+from typing import List, Optional
 from src.exception import MyException
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-from typing import List, Optional, Union
 from src.entity.config_entity import DataPreprocessingConfig
 from src.entity.artifact_entity import DataPreprocessingArtifacts
 from src.utils.main_utils import read_csv_file, save_df_as_csv, read_yaml_file
 
 try:
-    logging.info("Downloading NLTK resources...")
     nltk.download("wordnet", quiet=True)
     nltk.download("stopwords", quiet=True)
 except Exception as e:
@@ -46,11 +45,11 @@ class DataPreprocessing:
         """
         try:
             self.lemmatizer: WordNetLemmatizer = WordNetLemmatizer()
-            self.stop_words = set(stopwords.words("english"))
+            self.stop_words: set = set(stopwords.words("english"))
 
             if data_preprocessing_config is None:
-                params = read_yaml_file(filepath="params.yaml")
-                data_preprocessing_params = params.get("data_preprocessing", {})
+                params: dict = read_yaml_file(filepath="params.yaml")
+                data_preprocessing_params: dict = params.get("data_preprocessing", {})
 
                 self.data_preprocessing_config: DataPreprocessingConfig = (
                     DataPreprocessingConfig(
@@ -59,7 +58,9 @@ class DataPreprocessing:
                     )
                 )
             else:
-                self.data_preprocessing_config = data_preprocessing_config
+                self.data_preprocessing_config: DataPreprocessingConfig = (
+                    data_preprocessing_config
+                )
 
         except Exception as e:
             raise MyException(e, sys) from e
@@ -88,7 +89,7 @@ class DataPreprocessing:
         """Lemmatize tokens using WordNet lemmatizer."""
         return [self.lemmatizer.lemmatize(w) for w in tokens]
 
-    def _preprocess_text(self, text: Union[str, float]) -> str:
+    def _preprocess_text(self, text: str) -> str:
         """
         Apply full text preprocessing pipeline to a single text value.
 
@@ -98,21 +99,21 @@ class DataPreprocessing:
             - Tokenize, remove stopwords, lemmatize.
 
         Args:
-            text (Union[str, float]): Input text value.
+            text (str): Input text value.
 
         Returns:
             str: Preprocessed text.
         """
         try:
             raw_text: str = "" if text is None else str(text)
-            raw_text = raw_text.lower()
-            raw_text = self._remove_html(text=raw_text)
-            raw_text = self._remove_urls(text=raw_text)
-            raw_text = self._remove_punctuations(text=raw_text)
+            raw_text: str = raw_text.lower()
+            raw_text: str = self._remove_html(text=raw_text)
+            raw_text: str = self._remove_urls(text=raw_text)
+            raw_text: str = self._remove_punctuations(text=raw_text)
 
-            tokens = self._tokenize(text=raw_text)
-            tokens = self._remove_stopwords(tokens=tokens)
-            tokens = self._lemmatize_tokens(tokens=tokens)
+            tokens: List[str] = self._tokenize(text=raw_text)
+            tokens: List[str] = self._remove_stopwords(tokens=tokens)
+            tokens: List[str] = self._lemmatize_tokens(tokens=tokens)
 
             return " ".join(tokens)
 
@@ -136,7 +137,7 @@ class DataPreprocessing:
             MyException: If preprocessing fails.
         """
         try:
-            df_processed = df.copy()
+            df_processed: pd.DataFrame = df.copy()
 
             for feature in features:
                 if feature not in df_processed.columns:
@@ -217,9 +218,11 @@ class DataPreprocessing:
                 index=False,
             )
 
-            data_preprocessing_artifacts = DataPreprocessingArtifacts(
-                interim_train_filepath=interim_train_filepath,
-                interim_test_filepath=interim_test_filepath,
+            data_preprocessing_artifacts: DataPreprocessingArtifacts = (
+                DataPreprocessingArtifacts(
+                    interim_train_filepath=interim_train_filepath,
+                    interim_test_filepath=interim_test_filepath,
+                )
             )
 
             logging.info(
@@ -244,14 +247,11 @@ def main() -> DataPreprocessingArtifacts:
         MyException: If data preprocessing fails.
     """
     try:
-        data_preprocessor = DataPreprocessing()
+        data_preprocessor: DataPreprocessing = DataPreprocessing()
         data_preprocessing_artifacts: DataPreprocessingArtifacts = (
             data_preprocessor.initiate_data_preprocessing()
         )
         return data_preprocessing_artifacts
-
-    except MyException:
-        raise
 
     except Exception as e:
         raise MyException(e, sys) from e

@@ -51,8 +51,8 @@ class DataIngestion:
         """
         try:
             if data_ingestion_config is None:
-                params = read_yaml_file(filepath="params.yaml")
-                data_ingestion_params = params.get("data_ingestion", {})
+                params: dict = read_yaml_file(filepath="params.yaml")
+                data_ingestion_params: dict = params.get("data_ingestion", {})
 
                 self.data_ingestion_config: DataIngestionConfig = DataIngestionConfig(
                     test_size=float(data_ingestion_params["test_size"]),
@@ -198,7 +198,7 @@ class DataIngestion:
                 stratify=stratify_series,
             )
 
-            logging.info("Dumping training & testing data...")
+            logging.info("Saving training & testing data...")
             save_df_as_csv(
                 df=train_data,
                 filepath=self.data_ingestion_config.raw_train_filepath,
@@ -210,7 +210,7 @@ class DataIngestion:
                 index=False,
             )
 
-            data_ingestion_artifacts = DataIngestionArtifacts(
+            data_ingestion_artifacts: DataIngestionArtifacts = DataIngestionArtifacts(
                 raw_train_filepath=self.data_ingestion_config.raw_train_filepath,
                 raw_test_filepath=self.data_ingestion_config.raw_test_filepath,
             )
@@ -237,14 +237,11 @@ def main() -> DataIngestionArtifacts:
         MyException: If the data ingestion pipeline fails.
     """
     try:
-        data_ingestor = DataIngestion()
+        data_ingestor: DataIngestion = DataIngestion()
         data_ingestion_artifacts: DataIngestionArtifacts = (
             data_ingestor.initiate_data_ingestion()
         )
         return data_ingestion_artifacts
-
-    except MyException:
-        raise
 
     except Exception as e:
         raise MyException(e, sys) from e

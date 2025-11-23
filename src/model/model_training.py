@@ -38,8 +38,8 @@ class ModelTraining:
         """
         try:
             if model_training_config is None:
-                params = read_yaml_file(filepath="params.yaml")
-                model_training_params = params.get("model_training", {})
+                params: dict = read_yaml_file(filepath="params.yaml")
+                model_training_params: dict = params.get("model_training", {})
 
                 self.model_training_config: ModelTrainingConfig = ModelTrainingConfig(
                     target=str(model_training_params["target"]),
@@ -99,23 +99,6 @@ class ModelTraining:
         except Exception as e:
             raise MyException(e, sys) from e
 
-    def _save_model(self, model: LogisticRegression, model_filepath: str) -> None:
-        """
-        Persist the trained model to disk.
-
-        Args:
-            model (LogisticRegression): Trained Logistic Regression model.
-            model_filepath (str): Path to save the model.
-
-        Raises:
-            MyException: If saving the model fails.
-        """
-        try:
-            save_object(obj=model, filepath=model_filepath)
-
-        except Exception as e:
-            raise MyException(e, sys) from e
-
     def initiate_model_training(self) -> ModelTrainingArtifacts:
         """
         Execute the full model training workflow:
@@ -162,7 +145,7 @@ class ModelTraining:
 
             model_filepath: str = self.model_training_config.model_filepath
             logging.info("Saving trained model...")
-            self._save_model(model=model, model_filepath=model_filepath)
+            save_object(obj=model, filepath=model_filepath)
 
             model_training_artifacts: ModelTrainingArtifacts = ModelTrainingArtifacts(
                 model_filepath=model_filepath
@@ -187,7 +170,7 @@ def main() -> ModelTrainingArtifacts:
         MyException: If the model training pipeline fails.
     """
     try:
-        model_trainer = ModelTraining()
+        model_trainer: ModelTraining = ModelTraining()
         artifacts: ModelTrainingArtifacts = model_trainer.initiate_model_training()
         return artifacts
 

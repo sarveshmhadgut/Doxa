@@ -17,6 +17,9 @@ from src.constants import (
     MODELS_DIRNAME,
     VECTORIZER_FILENAME,
     MODEL_FILENAME,
+    REPORTS_DIRNAME,
+    METRICS_FILENAME,
+    MODEL_INFO_FILENAME,
 )
 
 
@@ -33,6 +36,7 @@ class TrainingPipelineConfig:
     pipeline_name: str = field(default=PIPELINE_NAME)
     data_dirpath: str = field(default_factory=lambda: os.path.join(DATA_DIRNAME))
     models_dirpath: str = field(default_factory=lambda: os.path.join(MODELS_DIRNAME))
+    reports_dirname: str = field(default_factory=lambda: os.path.join(REPORTS_DIRNAME))
 
 
 training_pipeline_config: Final[TrainingPipelineConfig] = TrainingPipelineConfig()
@@ -244,4 +248,49 @@ class ModelTrainingConfig:
         self.model_filepath = os.path.join(
             training_pipeline_config.models_dirpath,
             MODEL_FILENAME,
+        )
+
+
+@dataclass
+class ModelEvaluationConfig:
+    """
+    Configuration for the model evaluation stage.
+
+    Attributes:
+        processed_test_filepath (str): Path to the processed test data (features + target).
+        model_filepath (str): Path to the trained model file.
+        metrics_filepath (str): Path where the final evaluation metrics JSON will be saved.
+        model_info_filepath (str): Path where the model metadata JSON (e.g., run_id) will be saved.
+        target (str): Name of the target column.
+    """
+
+    processed_test_filepath: str = field(init=False)
+    model_filepath: str = field(init=False)
+    metrics_filepath: str = field(init=False)
+    model_info_filepath: str = field(init=False)
+
+    target: str
+
+    def __post_init__(self):
+        """
+        Initialize file system paths for inputs and report outputs,
+        and ensure the necessary reports directory exists.
+        """
+
+        self.processed_test_filepath = os.path.join(
+            training_pipeline_config.data_dirpath,
+            PROCESSED_DATA_DIRNAME,
+            PROCESSED_TEST_FILENAME,
+        )
+
+        self.model_filepath = os.path.join(
+            training_pipeline_config.models_dirpath, MODEL_FILENAME
+        )
+
+        self.metrics_filepath = os.path.join(
+            training_pipeline_config.reports_dirname, METRICS_FILENAME
+        )
+
+        self.model_info_filepath = os.path.join(
+            training_pipeline_config.reports_dirname, MODEL_INFO_FILENAME
         )

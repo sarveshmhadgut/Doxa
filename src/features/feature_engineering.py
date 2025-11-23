@@ -3,7 +3,7 @@ import pandas as pd
 from halo import Halo
 from numpy import ndarray
 from src.logger import logging
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 from src.exception import MyException
 from sklearn.feature_extraction.text import TfidfVectorizer
 from src.entity.config_entity import FeatureEngineeringConfig
@@ -42,9 +42,9 @@ class FeatureEngineering:
         """
         try:
             if feature_engineering_config is None:
-                params = read_yaml_file(filepath="params.yaml")
-                data_preprocessing_params = params.get("data_preprocessing", {})
-                feature_engineering_params = params.get("feature_engineering", {})
+                params: dict = read_yaml_file(filepath="params.yaml")
+                data_preprocessing_params: dict = params.get("data_preprocessing", {})
+                feature_engineering_params: dict = params.get("feature_engineering", {})
 
                 self.feature_engineering_config: FeatureEngineeringConfig = (
                     FeatureEngineeringConfig(
@@ -115,38 +115,23 @@ class FeatureEngineering:
             ):
                 processed_X_test = vectorizer.transform(interim_X_test)
 
-            feature_names = [f"feature_{i}" for i in range(processed_X_train.shape[1])]
+            feature_names: List[str] = [
+                f"feature_{i}" for i in range(processed_X_train.shape[1])
+            ]
 
-            processed_train_df = pd.DataFrame(
+            processed_train_df: pd.DataFrame = pd.DataFrame(
                 processed_X_train.toarray(),
                 columns=feature_names,
             )
             processed_train_df["label"] = interim_y_train
 
-            processed_test_df = pd.DataFrame(
+            processed_test_df: pd.DataFrame = pd.DataFrame(
                 processed_X_test.toarray(),
                 columns=feature_names,
             )
             processed_test_df["label"] = interim_y_test
 
             return processed_train_df, processed_test_df, vectorizer
-
-        except Exception as e:
-            raise MyException(e, sys) from e
-
-    def _save_vectorizer(self, vectorizer: TfidfVectorizer, filepath: str) -> None:
-        """
-        Persist the fitted TF-IDF vectorizer to disk.
-
-        Args:
-            vectorizer (TfidfVectorizer): Fitted vectorizer instance.
-            filepath (str): Target file path for the serialized vectorizer.
-
-        Raises:
-            MyException: If saving fails.
-        """
-        try:
-            save_object(obj=vectorizer, filepath=filepath)
 
         except Exception as e:
             raise MyException(e, sys) from e
@@ -226,10 +211,7 @@ class FeatureEngineering:
             vectorizer_filepath: str = (
                 self.feature_engineering_config.vectorizer_filepath
             )
-            self._save_vectorizer(
-                vectorizer=vectorizer,
-                filepath=vectorizer_filepath,
-            )
+            save_object(obj=vectorizer, filepath=vectorizer_filepath)
 
             feature_engineering_artifacts: FeatureEngineeringArtifacts = (
                 FeatureEngineeringArtifacts(
@@ -261,7 +243,7 @@ def main() -> FeatureEngineeringArtifacts:
         MyException: If the feature engineering pipeline fails.
     """
     try:
-        feature_engineer = FeatureEngineering()
+        feature_engineer: FeatureEngineering = FeatureEngineering()
         feature_engineering_artifacts: FeatureEngineeringArtifacts = (
             feature_engineer.initiate_feature_engineering()
         )

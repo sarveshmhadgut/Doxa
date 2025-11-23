@@ -46,3 +46,15 @@ stages:
     - model_training.max_iter
     outs:
     - models/model.pkl
+
+  model_evaluation:
+    cmd: uv run src/model/model_evaluation.py
+    deps:
+    - data/processed
+    - src/model/model_evaluation.py
+    params:
+    - model_training.target
+    metrics:
+    - reports/metrics.json
+    outs:
+    - reports/model_info.json

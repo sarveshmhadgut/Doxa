@@ -59,3 +59,18 @@ class ModelTrainingArtifacts:
     """
 
     model_filepath: str
+
+
+@dataclass
+class ModelEvaluationArtifacts:
+    """
+    Artifact object produced by the model evaluation step.
+
+    Attributes:
+        metrics_filepath (str): Local path to the saved metrics report (JSON).
+        model_info_filepath (str): Local path to the saved model metadata (JSON),
+            including MLflow run ID.
+    """
+
+    metrics_filepath: str
+    model_info_filepath: str
