@@ -2,6 +2,7 @@ stages:
   data_ingestion:
     cmd: uv run src/data/data_ingestion.py
     deps:
+    - src/constants/
     - src/data/data_ingestion.py
     params:
     - data_ingestion.test_size
@@ -12,6 +13,7 @@ stages:
   data_preprocessing:
     cmd: uv run src/data/data_preprocessing.py
     deps:
+    - src/constants/
     - data/raw
     - src/data/data_preprocessing.py
     params:
@@ -23,6 +25,7 @@ stages:
   feature_engineering:
     cmd: uv run src/features/feature_engineering.py
     deps:
+    - src/constants/
     - data/interim
     - src/features/feature_engineering.py
     params:
@@ -36,6 +39,7 @@ stages:
   model_training:
     cmd: uv run src/model/model_training.py
     deps:
+    - src/constants/
     - data/processed
     - src/model/model_training.py
     params:
@@ -50,6 +54,7 @@ stages:
   model_evaluation:
     cmd: uv run src/model/model_evaluation.py
     deps:
+    - src/constants/
     - data/processed
     - src/model/model_evaluation.py
     params:

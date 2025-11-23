@@ -28,7 +28,7 @@ class DataIngestion:
     Orchestrates data ingestion for the IMDb sentiment analysis project.
 
     Responsibilities:
-        - Load ingestion hyperparameters from params.yaml (if config not passed explicitly).
+        - Load ingestion hyperparameters from params.yaml.
         - Fetch dataset from S3.
         - Apply primitive preprocessing (duplicates removal, label filtering).
         - Split into train/test sets.
