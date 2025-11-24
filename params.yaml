@@ -1,8 +1,10 @@
 data_ingestion:
+  s3_dataset: "sample.csv"
   test_size: 0.20
   random_state: 42
 
 data_preprocessing:
+
   features: [ "review" ]
   target: "sentiment"
 

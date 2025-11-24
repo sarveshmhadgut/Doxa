@@ -75,7 +75,6 @@ class ModelEvaluation:
         Sets up MLflow tracking, DagsHub context, and the MLflow experiment name,
         temporarily suppressing informational logging during setup.
         """
-        original_level: int = logging.getLogger().level
 
         try:
             logging.getLogger().setLevel(logging.WARNING)
@@ -96,7 +95,7 @@ class ModelEvaluation:
             raise MyException(e, sys) from e
 
         finally:
-            logging.getLogger().setLevel(original_level)
+            logging.getLogger().setLevel(logging.INFO)
 
     def _evaluate_model(
         self, model: LogisticRegression, X_test: pd.DataFrame, y_test: pd.Series

@@ -20,6 +20,7 @@ from src.constants import (
     REPORTS_DIRNAME,
     METRICS_FILENAME,
     MODEL_INFO_FILENAME,
+    REGISTRATION_MODEL_NAME,
 )
 
 
@@ -67,17 +68,17 @@ class DataIngestionConfig:
         Initialize derived file system paths for the ingestion outputs and
         ensure the raw data directory exists.
         """
-        self.raw_data_dirpath = os.path.join(
+        self.raw_data_dirpath: str = os.path.join(
             training_pipeline_config.data_dirpath,
             DATA_INGESTION_DIRNAME,
         )
         os.makedirs(self.raw_data_dirpath, exist_ok=True)
 
-        self.raw_train_filepath = os.path.join(
+        self.raw_train_filepath: str = os.path.join(
             self.raw_data_dirpath,
             RAW_TRAIN_FILENAME,
         )
-        self.raw_test_filepath = os.path.join(
+        self.raw_test_filepath: str = os.path.join(
             self.raw_data_dirpath,
             RAW_TEST_FILENAME,
         )
@@ -112,28 +113,28 @@ class DataPreprocessingConfig:
         Initialize file system paths for raw and processed data, and ensure
         the processed data directory exists.
         """
-        self.raw_train_filepath = os.path.join(
+        self.raw_train_filepath: str = os.path.join(
             training_pipeline_config.data_dirpath,
             DATA_INGESTION_DIRNAME,
             RAW_TRAIN_FILENAME,
         )
-        self.raw_test_filepath = os.path.join(
+        self.raw_test_filepath: str = os.path.join(
             training_pipeline_config.data_dirpath,
             DATA_INGESTION_DIRNAME,
             RAW_TEST_FILENAME,
         )
 
-        self.interim_data_dirpath = os.path.join(
+        self.interim_data_dirpath: str = os.path.join(
             training_pipeline_config.data_dirpath,
             INTERIM_DATA_DIRNAME,
         )
         os.makedirs(self.interim_data_dirpath, exist_ok=True)
 
-        self.interim_train_filepath = os.path.join(
+        self.interim_train_filepath: str = os.path.join(
             self.interim_data_dirpath,
             INTERIM_TRAIN_FILENAME,
         )
-        self.interim_test_filepath = os.path.join(
+        self.interim_test_filepath: str = os.path.join(
             self.interim_data_dirpath,
             INTERIM_TEST_FILENAME,
         )
@@ -178,33 +179,33 @@ class FeatureEngineeringConfig:
         Initialize file system paths for interim inputs, processed outputs,
         and the vectorizer object, and ensure necessary directories exist.
         """
-        self.interim_train_filepath = os.path.join(
+        self.interim_train_filepath: str = os.path.join(
             training_pipeline_config.data_dirpath,
             INTERIM_DATA_DIRNAME,
             INTERIM_TRAIN_FILENAME,
         )
-        self.interim_test_filepath = os.path.join(
+        self.interim_test_filepath: str = os.path.join(
             training_pipeline_config.data_dirpath,
             INTERIM_DATA_DIRNAME,
             INTERIM_TEST_FILENAME,
         )
 
-        self.processed_data_dirpath = os.path.join(
+        self.processed_data_dirpath: str = os.path.join(
             training_pipeline_config.data_dirpath,
             PROCESSED_DATA_DIRNAME,
         )
         os.makedirs(self.processed_data_dirpath, exist_ok=True)
 
-        self.processed_train_filepath = os.path.join(
+        self.processed_train_filepath: str = os.path.join(
             self.processed_data_dirpath,
             PROCESSED_TRAIN_FILENAME,
         )
-        self.processed_test_filepath = os.path.join(
+        self.processed_test_filepath: str = os.path.join(
             self.processed_data_dirpath,
             PROCESSED_TEST_FILENAME,
         )
 
-        self.vectorizer_filepath = os.path.join(
+        self.vectorizer_filepath: str = os.path.join(
             training_pipeline_config.models_dirpath,
             VECTORIZER_FILENAME,
         )
@@ -239,13 +240,13 @@ class ModelTrainingConfig:
         """
         Initialize file system paths for processed training data and the model file.
         """
-        self.processed_train_filepath = os.path.join(
+        self.processed_train_filepath: str = os.path.join(
             training_pipeline_config.data_dirpath,
             PROCESSED_DATA_DIRNAME,
             PROCESSED_TRAIN_FILENAME,
         )
 
-        self.model_filepath = os.path.join(
+        self.model_filepath: str = os.path.join(
             training_pipeline_config.models_dirpath,
             MODEL_FILENAME,
         )
@@ -277,20 +278,44 @@ class ModelEvaluationConfig:
         and ensure the necessary reports directory exists.
         """
 
-        self.processed_test_filepath = os.path.join(
+        self.processed_test_filepath: str = os.path.join(
             training_pipeline_config.data_dirpath,
             PROCESSED_DATA_DIRNAME,
             PROCESSED_TEST_FILENAME,
         )
 
-        self.model_filepath = os.path.join(
+        self.model_filepath: str = os.path.join(
             training_pipeline_config.models_dirpath, MODEL_FILENAME
         )
 
-        self.metrics_filepath = os.path.join(
+        self.metrics_filepath: str = os.path.join(
             training_pipeline_config.reports_dirname, METRICS_FILENAME
         )
 
-        self.model_info_filepath = os.path.join(
+        self.model_info_filepath: str = os.path.join(
             training_pipeline_config.reports_dirname, MODEL_INFO_FILENAME
         )
+
+
+@dataclass
+class ModelRegistrationConfig:
+    """
+    Configuration for the model registration stage.
+
+    Attributes:
+        model_info_filepath (str)  : Path to the model metadata JSON (input).
+        registered_model_name (str): The name to use when registering the model in the MLflow Model Registry.
+    """
+
+    model_info_filepath: str = field(init=False)
+    registered_model_name: str = field(init=False)
+
+    def __post_init__(self):
+        """
+        Initialize file system paths for the model info report input and
+        the registered model name.
+        """
+        self.model_info_filepath: str = os.path.join(
+            training_pipeline_config.reports_dirname, MODEL_INFO_FILENAME
+        )
+        self.registered_model_name: str = str(REGISTRATION_MODEL_NAME)
