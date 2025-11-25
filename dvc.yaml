@@ -21,48 +21,47 @@ stages:
     - data_preprocessing.target
     outs:
     - data/interim
+  # feature_engineering:
+  #   cmd: uv run src/features/feature_engineering.py
+  #   deps:
+  #   - data/interim
+  #   - src/features/feature_engineering.py
+  #   params:
+  #   - data_preprocessing.target
+  #   - feature_engineering.max_features
+  #   - feature_engineering.feature
+  #   outs:
+  #   - data/processed
+  #   - models/vectorizer.pkl
 
-  feature_engineering:
-    cmd: uv run src/features/feature_engineering.py
-    deps:
-    - data/interim
-    - src/features/feature_engineering.py
-    params:
-    - data_preprocessing.target
-    - feature_engineering.max_features
-    - feature_engineering.feature
-    outs:
-    - data/processed
-    - models/vectorizer.pkl
+  # model_training:
+  #   cmd: uv run src/model/model_training.py
+  #   deps:
+  #   - data/processed
+  #   - src/model/model_training.py
+  #   params:
+  #   - model_training.target
+  #   - model_training.c
+  #   - model_training.solver
+  #   - model_training.penalty
+  #   - model_training.max_iter
+  #   outs:
+  #   - models/model.pkl
 
-  model_training:
-    cmd: uv run src/model/model_training.py
-    deps:
-    - data/processed
-    - src/model/model_training.py
-    params:
-    - model_training.target
-    - model_training.c
-    - model_training.solver
-    - model_training.penalty
-    - model_training.max_iter
-    outs:
-    - models/model.pkl
+  # model_evaluation:
+  #   cmd: uv run src/model/model_evaluation.py
+  #   deps:
+  #   - data/processed
+  #   - src/model/model_evaluation.py
+  #   params:
+  #   - model_training.target
+  #   metrics:
+  #   - reports/metrics.json
+  #   outs:
+  #   - reports/model_info.json
 
-  model_evaluation:
-    cmd: uv run src/model/model_evaluation.py
-    deps:
-    - data/processed
-    - src/model/model_evaluation.py
-    params:
-    - model_training.target
-    metrics:
-    - reports/metrics.json
-    outs:
-    - reports/model_info.json
-
-  model_registration:
-    cmd: uv run src/model/model_registration.py
-    deps:
-    - reports/model_info.json
-    - src/model/model_registration.py
+  # model_registration:
+  #   cmd: uv run src/model/model_registration.py
+  #   deps:
+  #   - reports/model_info.json
+  #   - src/model/model_registration.py

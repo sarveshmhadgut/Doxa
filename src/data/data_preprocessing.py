@@ -17,6 +17,8 @@ from src.utils.main_utils import read_csv_file, save_df_as_csv, read_yaml_file
 try:
     nltk.download("wordnet", quiet=True)
     nltk.download("stopwords", quiet=True)
+    nltk.download("punkt", quiet=True)
+    nltk.download("punkt_tab", quiet=True)
 except Exception as e:
     raise MyException(e, sys) from e
 
@@ -165,7 +167,8 @@ class DataPreprocessing:
 
             return " ".join(tokens)
 
-        except Exception:
+        except Exception as e:
+            logging.error(f"Error preprocessing text: {e}")
             return ""
 
     def _preprocess_data(
@@ -235,7 +238,8 @@ class DataPreprocessing:
 
             raw_train_data: pd.DataFrame = read_csv_file(filepath=raw_train_filepath)
             raw_test_data: pd.DataFrame = read_csv_file(filepath=raw_test_filepath)
-
+            print("Raw train", raw_train_data.head(2))
+            print("Raw test", raw_test_data.head(2))
             logging.info("Preprocessing training and testing data...")
             features: List[str] = self.data_preprocessing_config.features
             target: str = self.data_preprocessing_config.target
@@ -278,8 +282,8 @@ class DataPreprocessing:
             )
             logging.info("Data Preprocessing complete.")
 
-            print(interim_train_data.head(10))
-            print(interim_test_data.head(10))
+            print("Interim train", interim_train_data.head(2))
+            print("Interim test", interim_test_data.head(2))
             return data_preprocessing_artifacts
 
         except Exception as e:
