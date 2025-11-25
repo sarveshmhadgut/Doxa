@@ -101,7 +101,8 @@ class ModelEvaluation:
             logging.getLogger().setLevel(logging.WARNING)
 
             mlflow.set_tracking_uri(dagshub_uri)
-            dagshub.auth.add_app_token(dagshub_token)
+            if dagshub_token:
+                dagshub.auth.add_app_token(dagshub_token.strip())
 
             # with redirect_stdout(io.StringIO()):
             dagshub.init(
