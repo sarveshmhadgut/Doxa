@@ -89,38 +89,33 @@ class FeatureEngineering:
             MyException: If feature engineering fails.
         """
         try:
-            if feature not in train_df.columns:
-                raise MyException(
-                    ValueError(
-                        f"Feature column '{feature}' not found in train dataframe."
-                    ),
-                    sys,
-                )
-            if feature not in test_df.columns:
-                raise MyException(
-                    ValueError(
-                        f"Feature column '{feature}' not found in test dataframe."
-                    ),
-                    sys,
-                )
-
-            interim_X_train: List[str] = [
-                str(x).strip() for x in train_df[feature].fillna("").values
-            ]
+            print(train_df.head(10))
+            interim_X_train = train_df[feature].values
             interim_y_train: ndarray = train_df[target].values
 
-            interim_X_test: List[str] = [
-                str(x).strip() for x in test_df[feature].fillna("").values
-            ]
+            print(test_df.head(10))
+            interim_X_test: List[str] = test_df[feature].values
             interim_y_test: ndarray = test_df[target].values
 
-            vectorizer: TfidfVectorizer = TfidfVectorizer(max_features=max_features)
+            vectorizer: TfidfVectorizer = TfidfVectorizer(
+                max_features=max_features,
+                ngram_range=(1, 2),
+                min_df=1,
+                max_df=1.0,
+                sublinear_tf=True,
+            )
 
-            print(interim_X_train.head(20))
-            processed_X_train = vectorizer.fit_transform(interim_X_train)
+            with Halo(
+                text="Applying TF-IDF on interim training data...",
+                spinner="dots",
+            ):
+                processed_X_train = vectorizer.fit_transform(interim_X_train)
 
-            print(interim_X_test.head(20))
-            processed_X_test = vectorizer.transform(interim_X_test)
+            with Halo(
+                text="Applying TF-IDF on interim testing data...",
+                spinner="dots",
+            ):
+                processed_X_test = vectorizer.transform(interim_X_test)
 
             feature_names: List[str] = [
                 f"feature_{i}" for i in range(processed_X_train.shape[1])
