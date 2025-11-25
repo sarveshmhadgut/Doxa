@@ -99,7 +99,7 @@ class FeatureEngineering:
                 max_features=max_features,
                 ngram_range=(1, 2),
                 min_df=1,
-                max_df=0.95,
+                max_df=1.0,
                 sublinear_tf=True,
             )
 
