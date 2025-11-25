@@ -15,7 +15,7 @@ from mlflow.tracking.client import MlflowClient
 from mlflow.entities.model_registry import ModelVersion
 from src.data.data_preprocessing import DataPreprocessing
 from src.entity.config_entity import PredictionPipelineConfig
-from src.constants import DAGSHUB_URI, DAGSHUB_REPO, DAGSHUB_USERNAME
+from src.constants import DAGSHUB_URI, DAGSHUB_REPO, DAGSHUB_USERNAME, DAGSHUB_TOKEN
 
 load_dotenv()
 terminal_width: int = os.get_terminal_size().columns if os.isatty(1) else 80
@@ -64,7 +64,11 @@ class PredictionPipeline:
             raise MyException(e, sys) from e
 
     def _connect_dagshub(
-        self, dagshub_uri: str, dagshub_repo: str, dagshub_username: str
+        self,
+        dagshub_uri: str,
+        dagshub_repo: str,
+        dagshub_username: str,
+        dagshub_token: str,
     ) -> None:
         """
         Connects to DagsHub/MLflow tracking URI, suppressing verbose output.
@@ -73,6 +77,7 @@ class PredictionPipeline:
             dagshub_uri (str): The URI for DagsHub tracking.
             dagshub_repo (str): The name of the DagsHub repository.
             dagshub_username (str): The username of the DagsHub account.
+            dagshub_token (str): The DagsHub authentication token.
 
         Raises:
             MyException: If connection fails.
@@ -82,7 +87,19 @@ class PredictionPipeline:
                 return
 
             logging.getLogger().setLevel(logging.WARNING)
+
+            if not dagshub_username:
+                raise EnvironmentError("DAGSHUB_USERNAME is missing!")
+            if not dagshub_token:
+                raise EnvironmentError("DAGSHUB_TOKEN is missing!")
+            else:
+                dagshub.auth.add_app_token(dagshub_token)
+
             mlflow.set_tracking_uri(dagshub_uri)
+            os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_username
+            os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+            os.environ["DAGSHUB_TOKEN"] = dagshub_token
+
             with redirect_stdout(io.StringIO()):
                 dagshub.init(
                     repo_name=dagshub_repo,
@@ -209,11 +226,13 @@ class PredictionPipeline:
             dagshub_uri: str = os.getenv(DAGSHUB_URI)
             dagshub_repo: str = os.getenv(DAGSHUB_REPO)
             dagshub_username: str = os.getenv(DAGSHUB_USERNAME)
+            dagshub_token: str = os.getenv(DAGSHUB_TOKEN)
 
             self._connect_dagshub(
                 dagshub_uri=dagshub_uri,
                 dagshub_repo=dagshub_repo,
                 dagshub_username=dagshub_username,
+                dagshub_token=dagshub_token,
             )
 
             vectorizer_filepath = self.prediction_pipeline_config.vectorizer_filepath
@@ -257,11 +276,13 @@ class PredictionPipeline:
             dagshub_uri: str = os.getenv(DAGSHUB_URI)
             dagshub_repo: str = os.getenv(DAGSHUB_REPO)
             dagshub_username: str = os.getenv(DAGSHUB_USERNAME)
+            dagshub_token: str = os.getenv(DAGSHUB_TOKEN)
 
             self._connect_dagshub(
                 dagshub_uri=dagshub_uri,
                 dagshub_repo=dagshub_repo,
                 dagshub_username=dagshub_username,
+                dagshub_token=dagshub_token,
             )
 
             logging.info("Fetching vectorizer...")

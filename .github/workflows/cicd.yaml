@@ -32,7 +32,7 @@ jobs:
       run: uv sync --all-extras --dev
 
     - name: Run DVC Pipeline
-      run: uv run dvc repro -f
+      run: uv run dvc repro
 
     - name: Run Model Tests
       run: uv run tests/model_tests.py

@@ -9,10 +9,15 @@ from prometheus_client import (
     CONTENT_TYPE_LATEST,
 )
 
+
 app = Flask(__name__)
 pipeline = PredictionPipeline()
 registry = CollectorRegistry()
-pipeline.preheat()
+
+try:
+    pipeline.preheat()
+except Exception as e:
+    raise e
 
 REQUEST_COUNT = Counter(
     "app_request_count",
@@ -64,4 +69,5 @@ def metrics():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8008)
+    print("Starting Flask app...", flush=True)
+    app.run(debug=True, host="0.0.0.0", port=8080)
