@@ -1,6 +1,7 @@
 import os
 import sys
 import mlflow
+import dagshub
 from dotenv import load_dotenv
 from src.logger import logging
 from typing import List, Optional
@@ -81,11 +82,14 @@ class ModelPromotion:
                     "DAGSHUB_TOKEN environment variable is not set for MLflow tracking."
                 )
 
+            dagshub_token = dagshub_token.strip()
+
             # Set environment variables for MLflow authentication
             os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_username
             os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
             mlflow.set_tracking_uri(dagshub_uri)
+            dagshub.auth.add_app_token(dagshub_token)
 
             client: MlflowClient = mlflow.MlflowClient()
             return client
