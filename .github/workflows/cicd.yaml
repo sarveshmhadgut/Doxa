@@ -24,11 +24,14 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@v2
 
+    - name: Set up Python
+      run: uv python install 3.10
+
     - name: Sync Dependencies
       run: uv sync --all-extras --dev
 
     - name: Run DVC Pipeline
-      run: dvc repro
+      run: uv run dvc repro
 
     - name: Run Model Tests
       if: success()
