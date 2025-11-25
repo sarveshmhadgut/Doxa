@@ -81,14 +81,11 @@ class ModelRegistration:
             logging.getLogger().setLevel(logging.WARNING)
 
             with Halo(text="Connecting to Dagshub...", spinner="dots"):
-                mlflow.set_tracking_uri(dagshub_uri)
+                # Set environment variables for MLflow authentication
+                os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_username
+                os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("DAGSHUB_TOKEN")
 
-                with redirect_stdout(io.StringIO()):
-                    dagshub.init(
-                        repo_name=dagshub_repo,
-                        repo_owner=dagshub_username,
-                        mlflow=True,
-                    )
+                mlflow.set_tracking_uri(dagshub_uri)
 
         except Exception as e:
             raise MyException(e, sys) from e

@@ -71,7 +71,7 @@ stages:
       nfiles: 2
     - path: models/vectorizer.pkl
       hash: md5
-      md5: 7411351878bd2020117bc10d97ff6604
+      md5: fe03d15ce1a4d0490bbf2f7d1be9d13f
       size: 36633
   model_training:
     cmd: uv run src/model/model_training.py
@@ -119,16 +119,16 @@ stages:
       size: 215
     - path: reports/model_info.json
       hash: md5
-      md5: 26c25d8c75609ebd93998ecd605f6b75
+      md5: 2ae3e64c7ec0643a07aaf73945ee1526
       size: 90
   model_registration:
     cmd: uv run src/model/model_registration.py
     deps:
     - path: reports/model_info.json
       hash: md5
-      md5: 26c25d8c75609ebd93998ecd605f6b75
+      md5: 2ae3e64c7ec0643a07aaf73945ee1526
       size: 90
     - path: src/model/model_registration.py
       hash: md5
-      md5: 33e1a4c2c9137f3147c5dd2de817921a
-      size: 6695
+      md5: 8fd03bf1dab5196d0add0bd5892bad96
+      size: 6676
