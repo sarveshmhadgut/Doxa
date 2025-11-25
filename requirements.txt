@@ -124,7 +124,7 @@ matplotlib
 matplotlib-inline
 mdurl
 mistune
-mlflow
+mlflow==2.22.2
 mlflow-skinny
 multidict
 mypy-extensions

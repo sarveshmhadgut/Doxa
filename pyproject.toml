@@ -131,7 +131,7 @@ dependencies = [
     "matplotlib-inline",
     "mdurl",
     "mistune",
-    "mlflow",
+    "mlflow==2.22.2",
     "mlflow-skinny",
     "multidict",
     "mypy-extensions",
@@ -239,5 +239,5 @@ dependencies = [
     "xgboost",
     "yarl",
     "zc-lockfile",
-    "zipp"
+    "zipp",
 ]

@@ -356,4 +356,4 @@ class ModelPromotionConfig:
     registered_model_name: str = field(init=False)
 
     def __post_init__(self):
-        self.registered_model_name: str = field(default=REGISTRATION_MODEL_NAME)
+        self.registered_model_name: str = REGISTRATION_MODEL_NAME

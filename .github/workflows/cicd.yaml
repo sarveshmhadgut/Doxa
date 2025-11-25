@@ -1,0 +1,42 @@
+name: Doxa CICD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DAGSHUB_URI: ${{ secrets.DAGSHUB_URI }}
+      DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+      DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+      DAGSHUB_REPO: ${{ secrets.DAGSHUB_REPO }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      DATASET_BUCKET_NAME: ${{ secrets.DATASET_BUCKET_NAME }}
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+
+    - name: Sync Dependencies
+      run: uv sync --all-extras --dev
+
+    - name: Run DVC Pipeline
+      run: dvc repro
+
+    - name: Run Model Tests
+      if: success()
+      run: uv run tests/model_tests.py
+
+    - name: Promote Model
+      run: uv run src/model/model_promotion.py
+
+    - name: Run App Tests
+      if: success()
+      run: uv run tests/app_tests.py
