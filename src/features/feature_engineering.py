@@ -114,40 +114,7 @@ class FeatureEngineering:
             ]
             interim_y_test: ndarray = test_df[target].values
 
-            num_non_empty_train = sum(1 for doc in interim_X_train if len(doc) > 0)
-            num_non_empty_test = sum(1 for doc in interim_X_test if len(doc) > 0)
-            logging.info(
-                f"TF-IDF diagnostic: non-empty docs - train={num_non_empty_train}, test={num_non_empty_test}"
-            )
-
-            if num_non_empty_train == 0:
-                sample_rows = train_df.head(5).to_dict(orient="records")
-                raise MyException(
-                    ValueError(
-                        f"TF-IDF failure: no non-empty documents found in training feature '{feature}'. "
-                        f"Please check DVC artifacts / preprocessing. sample_rows={sample_rows}"
-                    ),
-                    sys,
-                )
-
-            non_empty_count = sum(bool(str(x).strip()) for x in interim_X_train)
-            if non_empty_count == 0:
-                sample_rows = train_df.head(5).to_dict(orient="records")
-                raise MyException(
-                    Exception(
-                        f"TF-IDF failure: no non-empty documents found in training feature '{feature}'. "
-                        f"Please check DVC artifacts / preprocessing. sample_rows={sample_rows}"
-                    ),
-                    sys,
-                )
-
-            vectorizer: TfidfVectorizer = TfidfVectorizer(
-                max_features=max_features,
-                ngram_range=(1, 2),
-                min_df=1,
-                max_df=1.0,
-                sublinear_tf=True,
-            )
+            vectorizer: TfidfVectorizer = TfidfVectorizer(max_features=max_features)
 
             with Halo(
                 text="Applying TF-IDF on interim training data...",
@@ -178,9 +145,6 @@ class FeatureEngineering:
             processed_test_df["label"] = interim_y_test
 
             return processed_train_df, processed_test_df, vectorizer
-
-        except MyException:
-            raise
 
         except Exception as e:
             raise MyException(e, sys) from e

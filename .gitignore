@@ -10,6 +10,7 @@ local_s3/
 .vscode/
 flow.txt
 notebooks/*.csv
+test.ipynb
 
 # DVC
 /data
