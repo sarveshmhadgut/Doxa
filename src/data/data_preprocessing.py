@@ -238,8 +238,7 @@ class DataPreprocessing:
 
             raw_train_data: pd.DataFrame = read_csv_file(filepath=raw_train_filepath)
             raw_test_data: pd.DataFrame = read_csv_file(filepath=raw_test_filepath)
-            print("Raw train", raw_train_data.head(2))
-            print("Raw test", raw_test_data.head(2))
+
             logging.info("Preprocessing training and testing data...")
             features: List[str] = self.data_preprocessing_config.features
             target: str = self.data_preprocessing_config.target
@@ -282,8 +281,6 @@ class DataPreprocessing:
             )
             logging.info("Data Preprocessing complete.")
 
-            print("Interim train", interim_train_data.head(2))
-            print("Interim test", interim_test_data.head(2))
             return data_preprocessing_artifacts
 
         except Exception as e:
