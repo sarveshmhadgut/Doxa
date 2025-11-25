@@ -1,4 +1,3 @@
-import io
 import os
 import sys
 import mlflow
@@ -9,12 +8,13 @@ from dotenv import load_dotenv
 from src.logger import logging
 from typing import Dict, Tuple
 from src.exception import MyException
-from contextlib import redirect_stdout
+
+# from contextlib import redirect_stdout
 from mlflow.models import infer_signature
 from sklearn.linear_model import LogisticRegression
 from src.entity.config_entity import ModelEvaluationConfig
 from src.entity.artifact_entity import ModelEvaluationArtifacts
-from src.constants import DAGSHUB_URI, DAGSHUB_REPO, DAGSHUB_USERNAME
+from src.constants import DAGSHUB_URI, DAGSHUB_REPO, DAGSHUB_USERNAME, DAGSHUB_TOKEN
 
 from src.utils.main_utils import (
     load_object,
@@ -77,7 +77,11 @@ class ModelEvaluation:
             raise MyException(e, sys) from e
 
     def setup_experiment(
-        self, dagshub_uri: str, dagshub_repo: str, dagshub_username: str
+        self,
+        dagshub_uri: str,
+        dagshub_repo: str,
+        dagshub_username: str,
+        dagshub_token: str,
     ) -> None:
         """
         Sets up MLflow tracking, DagsHub context, and the MLflow experiment name,
@@ -87,6 +91,7 @@ class ModelEvaluation:
             dagshub_uri (str): URI for DagsHub MLflow tracking.
             dagshub_repo (str): Name of the DagsHub repository.
             dagshub_username (str): Username of the DagsHub account.
+            dagshub_token (str): DagsHub personal access token.
 
         Raises:
             MyException: If experiment setup fails.
@@ -96,6 +101,7 @@ class ModelEvaluation:
             logging.getLogger().setLevel(logging.WARNING)
 
             mlflow.set_tracking_uri(dagshub_uri)
+            dagshub.auth.add_app_token(dagshub_token)
 
             # with redirect_stdout(io.StringIO()):
             dagshub.init(
@@ -239,12 +245,14 @@ class ModelEvaluation:
             dagshub_uri: str = os.getenv(DAGSHUB_URI)
             dagshub_repo: str = os.getenv(DAGSHUB_REPO)
             dagshub_username: str = os.getenv(DAGSHUB_USERNAME)
+            dagshub_token: str = os.getenv(DAGSHUB_TOKEN)
 
             logging.info("Configuring experiment...")
             self.setup_experiment(
                 dagshub_uri=dagshub_uri,
                 dagshub_repo=dagshub_repo,
                 dagshub_username=dagshub_username,
+                dagshub_token=dagshub_token,
             )
 
             logging.info("Running MLFlow run...")
