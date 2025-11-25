@@ -56,8 +56,8 @@ stages:
       nfiles: 2
     - path: src/features/feature_engineering.py
       hash: md5
-      md5: aec6ddc20257638ffba1ea7f11cb2b93
-      size: 9623
+      md5: 13e0df0b1f38e58e37657872998385da
+      size: 11083
     params:
       params.yaml:
         data_preprocessing.target: sentiment
@@ -71,7 +71,7 @@ stages:
       nfiles: 2
     - path: models/vectorizer.pkl
       hash: md5
-      md5: 97fb5a2b1be0a0f48af10b12e8b79b68
+      md5: 9f17804e208a9fd5e472d83ef2bf2452
       size: 36635
   model_training:
     cmd: uv run src/model/model_training.py

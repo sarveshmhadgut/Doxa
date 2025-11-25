@@ -89,11 +89,46 @@ class FeatureEngineering:
             MyException: If feature engineering fails.
         """
         try:
-            interim_X_train: ndarray = train_df[feature].fillna("").values
+            if feature not in train_df.columns:
+                raise MyException(
+                    ValueError(
+                        f"Feature column '{feature}' not found in train dataframe."
+                    ),
+                    sys,
+                )
+            if feature not in test_df.columns:
+                raise MyException(
+                    ValueError(
+                        f"Feature column '{feature}' not found in test dataframe."
+                    ),
+                    sys,
+                )
+
+            interim_X_train: List[str] = [
+                str(x).strip() for x in train_df[feature].fillna("").values
+            ]
             interim_y_train: ndarray = train_df[target].values
 
-            interim_X_test: ndarray = test_df[feature].fillna("").values
+            interim_X_test: List[str] = [
+                str(x).strip() for x in test_df[feature].fillna("").values
+            ]
             interim_y_test: ndarray = test_df[target].values
+
+            num_non_empty_train = sum(1 for doc in interim_X_train if len(doc) > 0)
+            num_non_empty_test = sum(1 for doc in interim_X_test if len(doc) > 0)
+            logging.info(
+                f"TF-IDF diagnostic: non-empty docs - train={num_non_empty_train}, test={num_non_empty_test}"
+            )
+
+            if num_non_empty_train == 0:
+                sample_rows = train_df.head(5).to_dict(orient="records")
+                raise MyException(
+                    ValueError(
+                        f"TF-IDF failure: no non-empty documents found in training feature '{feature}'. "
+                        f"Please check DVC artifacts / preprocessing. sample_rows={sample_rows}"
+                    ),
+                    sys,
+                )
 
             vectorizer: TfidfVectorizer = TfidfVectorizer(
                 max_features=max_features,
@@ -132,6 +167,9 @@ class FeatureEngineering:
             processed_test_df["label"] = interim_y_test
 
             return processed_train_df, processed_test_df, vectorizer
+
+        except MyException:
+            raise
 
         except Exception as e:
             raise MyException(e, sys) from e
