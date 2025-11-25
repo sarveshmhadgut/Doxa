@@ -278,6 +278,8 @@ class DataPreprocessing:
             )
             logging.info("Data Preprocessing complete.")
 
+            print(interim_train_data.head(10))
+            print(interim_test_data.head(10))
             return data_preprocessing_artifacts
 
         except Exception as e:

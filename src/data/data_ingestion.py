@@ -220,6 +220,8 @@ class DataIngestion:
             )
 
             logging.info("Data Ingestion complete.")
+            print(train_data.head(10))
+            print(test_data.head(10))
             return data_ingestion_artifacts
 
         except Exception as e:

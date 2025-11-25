@@ -89,11 +89,9 @@ class FeatureEngineering:
             MyException: If feature engineering fails.
         """
         try:
-            print(train_df.head(10))
             interim_X_train = train_df[feature].values
             interim_y_train: ndarray = train_df[target].values
 
-            print(test_df.head(10))
             interim_X_test: List[str] = test_df[feature].values
             interim_y_test: ndarray = test_df[target].values
 
