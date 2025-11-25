@@ -4,7 +4,6 @@ import sys
 import mlflow
 import dagshub
 import pandas as pd
-from halo import Halo
 from numpy import ndarray
 from dotenv import load_dotenv
 from src.logger import logging
@@ -96,17 +95,16 @@ class ModelEvaluation:
         try:
             logging.getLogger().setLevel(logging.WARNING)
 
-            with Halo(text="Configuring experiment...", spinner="dots"):
-                mlflow.set_tracking_uri(dagshub_uri)
+            mlflow.set_tracking_uri(dagshub_uri)
 
-                with redirect_stdout(io.StringIO()):
-                    dagshub.init(
-                        repo_name=dagshub_repo,
-                        repo_owner=dagshub_username,
-                        mlflow=True,
-                    )
+            # with redirect_stdout(io.StringIO()):
+            dagshub.init(
+                repo_name=dagshub_repo,
+                repo_owner=dagshub_username,
+                mlflow=True,
+            )
 
-                mlflow.set_experiment("Model Evaluation")
+            mlflow.set_experiment("Model Evaluation")
 
         except Exception as e:
             raise MyException(e, sys) from e
@@ -132,12 +130,8 @@ class ModelEvaluation:
             MyException: If evaluation fails.
         """
         try:
-            with Halo(
-                text="Evaluating model...",
-                spinner="dots",
-            ):
-                y_hat: ndarray = model.predict(X_test)
-                y_hat_proba: ndarray = model.predict_proba(X_test)
+            y_hat: ndarray = model.predict(X_test)
+            y_hat_proba: ndarray = model.predict_proba(X_test)
 
             metrics: dict = {
                 "accuracy": accuracy_score(y_test, y_hat),
@@ -199,16 +193,12 @@ class ModelEvaluation:
                     model_output=model.predict(input_slice),
                 )
 
-                with Halo(
-                    text="Logging model...",
-                    spinner="dots",
-                ):
-                    mlflow.sklearn.log_model(
-                        model,
-                        "model",
-                        signature=signature,
-                        input_example=input_slice,
-                    )
+                mlflow.sklearn.log_model(
+                    model,
+                    "model",
+                    signature=signature,
+                    input_example=input_slice,
+                )
 
                 model_info: dict = {
                     "run_id": run.info.run_id,

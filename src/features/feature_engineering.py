@@ -1,10 +1,9 @@
 import sys
 import pandas as pd
-from halo import Halo
 from numpy import ndarray
 from src.logger import logging
-from typing import Optional, Tuple, List
 from src.exception import MyException
+from typing import Optional, Tuple, List
 from sklearn.feature_extraction.text import TfidfVectorizer
 from src.entity.config_entity import FeatureEngineeringConfig
 from src.entity.artifact_entity import FeatureEngineeringArtifacts
@@ -103,17 +102,9 @@ class FeatureEngineering:
                 sublinear_tf=True,
             )
 
-            with Halo(
-                text="Applying TF-IDF on interim training data...",
-                spinner="dots",
-            ):
-                processed_X_train = vectorizer.fit_transform(interim_X_train)
+            processed_X_train = vectorizer.fit_transform(interim_X_train)
 
-            with Halo(
-                text="Applying TF-IDF on interim testing data...",
-                spinner="dots",
-            ):
-                processed_X_test = vectorizer.transform(interim_X_test)
+            processed_X_test = vectorizer.transform(interim_X_test)
 
             feature_names: List[str] = [
                 f"feature_{i}" for i in range(processed_X_train.shape[1])
@@ -186,26 +177,17 @@ class FeatureEngineering:
                 self.feature_engineering_config.processed_test_filepath
             )
 
-            logging.info("Saving processed training & testing data...")
-            with Halo(
-                text="Saving processed training data...",
-                spinner="dots",
-            ):
-                save_df_as_csv(
-                    df=processed_train_df,
-                    filepath=processed_train_filepath,
-                    index=False,
-                )
+            save_df_as_csv(
+                df=processed_train_df,
+                filepath=processed_train_filepath,
+                index=False,
+            )
 
-            with Halo(
-                text="Saving processed training data...",
-                spinner="dots",
-            ):
-                save_df_as_csv(
-                    df=processed_test_df,
-                    filepath=processed_test_filepath,
-                    index=False,
-                )
+            save_df_as_csv(
+                df=processed_test_df,
+                filepath=processed_test_filepath,
+                index=False,
+            )
 
             logging.info("Dumping TF-IDF vectorizer...")
             vectorizer_filepath: str = (

@@ -3,7 +3,6 @@ import sys
 import string
 import nltk
 import pandas as pd
-from halo import Halo
 from src.logger import logging
 from nltk.corpus import stopwords
 from typing import List, Optional
@@ -197,13 +196,9 @@ class DataPreprocessing:
                     )
                     continue
 
-                with Halo(
-                    text=f"Preprocessing feature: '{feature}'...",
-                    spinner="dots",
-                ):
-                    df_processed[feature] = (
-                        df_processed[feature].astype(str).apply(self._preprocess_text)
-                    )
+                df_processed[feature] = (
+                    df_processed[feature].astype(str).apply(self._preprocess_text)
+                )
 
             df_processed[target] = df_processed[target].map(
                 {"negative": 0, "positive": 1}

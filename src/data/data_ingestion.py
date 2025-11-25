@@ -1,7 +1,6 @@
 import os
 import sys
 import pandas as pd
-from halo import Halo
 from src.logger import logging
 from dotenv import load_dotenv
 from typing import Optional, Tuple
@@ -173,12 +172,7 @@ class DataIngestion:
                 aws_region=aws_region,
             )
 
-            logging.info("Fetching dataset from S3...")
-            with Halo(
-                text="Fetching dataset from S3...",
-                spinner="dots",
-            ):
-                df: pd.DataFrame = s3.fetch_csv_from_s3(file_key=AWS_CSV_FILENAME)
+            df: pd.DataFrame = s3.fetch_csv_from_s3(file_key=AWS_CSV_FILENAME)
 
             logging.info("Performing primitive preprocessing...")
             processed_df: pd.DataFrame = self._preprocess_data(df=df)
