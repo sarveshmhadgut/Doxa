@@ -27,6 +27,12 @@ class ModelRegistration:
     Handles registering the final evaluated model into the MLflow Model Registry,
     retrieving the necessary run ID and artifact path from the model info report.
     The model is tagged with 'stage=Staging' for version control.
+
+    Responsibilities:
+        - Connect to DagsHub/MLflow.
+        - Read model metadata (run ID, path) from local report.
+        - Register the model in MLflow Model Registry.
+        - Tag the registered model as 'Staging'.
     """
 
     def __init__(
@@ -38,6 +44,9 @@ class ModelRegistration:
         Args:
             model_registration_config (ModelRegistrationConfig): Configuration object
                 containing model name and report file paths.
+
+        Raises:
+            MyException: If initialization fails.
         """
         try:
             if model_registration_config is None:
@@ -58,6 +67,14 @@ class ModelRegistration:
         """
         Sets up MLflow tracking URI and DagsHub context connection.
         Logging level is temporarily set to WARNING to suppress initialization noise.
+
+        Args:
+            dagshub_uri (str): URI for DagsHub MLflow tracking.
+            dagshub_repo (str): Name of the DagsHub repository.
+            dagshub_username (str): Username of the DagsHub account.
+
+        Raises:
+            MyException: If connection fails.
         """
 
         try:
@@ -88,6 +105,9 @@ class ModelRegistration:
 
         Returns:
             Dict[str, str]: Dictionary containing 'run_id' and 'model_path'.
+
+        Raises:
+            MyException: If reading model info fails.
         """
         try:
             with open(model_info_filepath, "r") as file:
@@ -103,6 +123,9 @@ class ModelRegistration:
         Args:
             model_name (str)           : The name under which the model will be registered.
             model_info (Dict[str, str]): Contains the MLflow 'run_id' and 'model_path'.
+
+        Raises:
+            MyException: If registration fails.
         """
         try:
             model_uri: str = f"runs:/{model_info['run_id']}/{model_info['model_path']}"
@@ -127,6 +150,9 @@ class ModelRegistration:
     def initiate_model_registration(self) -> None:
         """
         Orchestrates the connection, data reading, and model registration process.
+
+        Raises:
+            MyException: If model registration initiation fails.
         """
         try:
             logging.info("Starting model registration...")
@@ -167,7 +193,12 @@ class ModelRegistration:
 
 
 def main():
-    """Main execution function for the model registration component."""
+    """
+    Main execution function for the model registration component.
+
+    Raises:
+        MyException: If model registration fails.
+    """
     try:
         model_registrant: ModelRegistration = ModelRegistration(
             model_registration_config=None

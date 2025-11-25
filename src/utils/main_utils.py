@@ -17,6 +17,9 @@ def get_current_timestamp() -> str:
 
     Returns:
         str: Formatted current timestamp.
+
+    Raises:
+        Exception: If timestamp generation fails.
     """
     timestamp: str = datetime.now().strftime("%d-%b-%y_%H-%M-%S")
     return timestamp

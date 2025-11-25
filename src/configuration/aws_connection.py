@@ -9,7 +9,7 @@ class S3Operations:
     """
     Wrapper around basic S3 operations required by the pipeline.
 
-    Currently supports:
+    Responsibilities:
         - Fetching a CSV file from S3 into a pandas DataFrame.
     """
 

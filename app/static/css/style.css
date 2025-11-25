@@ -1,0 +1,312 @@
+/* Sentiment Analysis App - Glassmorphism Style */
+
+:root {
+    --primary-bg: #0a0a0f;
+    --glass-bg: #0F0F1966;
+    --text-primary: #fff9e8;
+    --text-secondary: #b8b5d1;
+    --accent-color: #FFE699;
+    --success-color: #12FBCA;
+    --error-color: #f87171;
+    --negative-color: #ef4444;
+    --border-radius: 16px;
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    background: var(--primary-bg);
+    background-image:
+        linear-gradient(#0A0A0F55, #0A0A0F55),
+        url('../VF_Mac.jpeg');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    color: var(--text-primary);
+    padding: 20px;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #0A0A0F55, #1E1E2D44);
+    z-index: -2;
+    pointer-events: none;
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+    background: var(--glass-bg);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid #FFFFFF1F;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #FFFFFF05;
+    border-radius: var(--border-radius);
+    pointer-events: none;
+    z-index: -1;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #79d2ff;
+    letter-spacing: -0.01em;
+}
+
+/* Premium title styling */
+.main-title {
+    font-family: 'Avenir Next Condensed', sans-serif;
+    font-weight: 700;
+    background: linear-gradient(45deg, #79d2ff, #79d2ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.title-highlight {
+    color: var(--accent-color);
+}
+
+/* Style for the textarea label */
+.textarea-label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+}
+
+/* Slight tweak for textarea focus to match label */
+textarea:focus {
+    border-color: var(--accent-color);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+    font-size: 0.95rem;
+}
+
+textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: #78D2FF10;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid #FFFFFF26;
+    border-radius: 12px;
+    color: var(--accent-color);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: var(--transition);
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.6;
+}
+
+textarea::placeholder {
+    color: #FFFFFF99;
+    opacity: 1;
+}
+
+textarea:focus {
+    border-color: #78D2FF4D;
+    background: #78D2FF17;
+    outline: none;
+}
+
+button {
+    background: #79d2ff;
+    color: var(--primary-bg);
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+}
+
+button:hover:not(:disabled) {
+    background: #000;
+    color: #79d2ff;
+    transform: translateY(-2px);
+}
+
+button:disabled {
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.6;
+}
+
+.result {
+    background: #8FFFE733;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid #8FFFE74D;
+    border-radius: 12px;
+    padding: 0;
+    margin-top: 1rem;
+    color: var(--success-color);
+    text-align: center;
+    font-weight: 500;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    animation: slideIn 0.3s ease-out;
+    overflow: hidden;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result-gif {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.positive {
+    background: #8FFFE726;
+    border-color: #8FFFE766;
+    color: var(--success-color);
+}
+
+.negative {
+    background: #F2940026;
+    border-color: #f2300066;
+    color: #f23000;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        background-attachment: scroll;
+        padding: 10px;
+    }
+
+    .container {
+        padding: 1.5rem;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    textarea {
+        min-height: 120px;
+        font-size: 0.95rem;
+    }
+
+    button {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .result {
+        font-size: 1.1rem;
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 1rem;
+        margin: 10px;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+    }
+
+    textarea {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9rem;
+    }
+
+    button {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(25px)) {
+    .container {
+        background: #0F0F19F2;
+    }
+
+    textarea {
+        background: #FFFFFF26;
+    }
+}
+
+/* Accessibility */
+*:focus-visible {
+    outline: 2px solid var(--success-color);
+    outline-offset: 2px;
+}

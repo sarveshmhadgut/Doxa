@@ -40,6 +40,12 @@ class ModelEvaluation:
     Handles the evaluation of a trained model against test data,
     calculates key metrics, and logs the results and the model
     to MLflow/DVC via DagsHub.
+
+    Responsibilities:
+        - Setup MLflow experiment and DagsHub connection.
+        - Evaluate model performance on test data.
+        - Log metrics, parameters, and model to MLflow.
+        - Save local reports (metrics, model info).
     """
 
     def __init__(self, model_evaluation_config: ModelEvaluationConfig = None) -> None:
@@ -49,6 +55,9 @@ class ModelEvaluation:
 
         Args:
             model_evaluation_config (ModelEvaluationConfig, optional): Configuration object.
+
+        Raises:
+            MyException: If initialization fails.
         """
         try:
             if model_evaluation_config is None:
@@ -74,6 +83,14 @@ class ModelEvaluation:
         """
         Sets up MLflow tracking, DagsHub context, and the MLflow experiment name,
         temporarily suppressing informational logging during setup.
+
+        Args:
+            dagshub_uri (str): URI for DagsHub MLflow tracking.
+            dagshub_repo (str): Name of the DagsHub repository.
+            dagshub_username (str): Username of the DagsHub account.
+
+        Raises:
+            MyException: If experiment setup fails.
         """
 
         try:
@@ -110,6 +127,9 @@ class ModelEvaluation:
 
         Returns:
             Dict[str, float]: Dictionary of calculated metrics.
+
+        Raises:
+            MyException: If evaluation fails.
         """
         try:
             with Halo(
@@ -139,6 +159,9 @@ class ModelEvaluation:
 
         Returns:
             Tuple[str, str]: A tuple containing the metrics_filepath and model_info_filepath.
+
+        Raises:
+            MyException: If the MLflow experiment run fails.
         """
         try:
             with mlflow.start_run() as run:
@@ -217,6 +240,9 @@ class ModelEvaluation:
 
         Returns:
             ModelEvaluationArtifacts: Artifacts object containing paths to generated reports.
+
+        Raises:
+            MyException: If model evaluation initiation fails.
         """
         try:
             logging.info("Starting model evaluation...")

@@ -44,6 +44,30 @@ training_pipeline_config: Final[TrainingPipelineConfig] = TrainingPipelineConfig
 
 
 @dataclass
+class PredictionPipelineConfig:
+    """
+    Configuration for the prediction pipeline.
+
+    Attributes:
+        vectorizer_filepath (str): Path to the saved vectorizer object.
+        model_name (str): Name of the model in MLflow registry.
+    """
+
+    vectorizer_filepath: str = field(init=False)
+    model_name: str = field(init=False)
+
+    def __post_init__(self):
+        """
+        Initialize file system paths.
+        """
+        self.vectorizer_filepath: str = os.path.join(
+            training_pipeline_config.models_dirpath,
+            VECTORIZER_FILENAME,
+        )
+        self.model_name: str = str(REGISTRATION_MODEL_NAME)
+
+
+@dataclass
 class DataIngestionConfig:
     """
     Configuration for the data ingestion stage.
@@ -308,7 +332,7 @@ class ModelRegistrationConfig:
     """
 
     model_info_filepath: str = field(init=False)
-    registered_model_name: str = field(init=False)
+    registered_model_name: str = field(default=REGISTRATION_MODEL_NAME)
 
     def __post_init__(self):
         """
@@ -318,4 +342,18 @@ class ModelRegistrationConfig:
         self.model_info_filepath: str = os.path.join(
             training_pipeline_config.reports_dirname, MODEL_INFO_FILENAME
         )
-        self.registered_model_name: str = str(REGISTRATION_MODEL_NAME)
+
+
+@dataclass
+class ModelPromotionConfig:
+    """
+    Configuration for the model promotion stage.
+
+    Attributes:
+        registered_model_name (str): The name of the registered model to promote.
+    """
+
+    registered_model_name: str = field(init=False)
+
+    def __post_init__(self):
+        self.registered_model_name: str = field(default=REGISTRATION_MODEL_NAME)

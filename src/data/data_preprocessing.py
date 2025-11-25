@@ -66,27 +66,75 @@ class DataPreprocessing:
             raise MyException(e, sys) from e
 
     def _remove_html(self, text: str) -> str:
-        """Remove HTML tags from text."""
+        """
+        Remove HTML tags from text.
+
+        Args:
+            text (str): Input text.
+
+        Returns:
+            str: Text with HTML tags removed.
+        """
         return re.sub(r"<.*?>", " ", text)
 
     def _remove_urls(self, text: str) -> str:
-        """Remove URLs from text."""
+        """
+        Remove URLs from text.
+
+        Args:
+            text (str): Input text.
+
+        Returns:
+            str: Text with URLs removed.
+        """
         return re.sub(r"http\S+|www\S+", " ", text)
 
     def _remove_punctuations(self, text: str) -> str:
-        """Remove punctuation characters from text."""
+        """
+        Remove punctuation characters from text.
+
+        Args:
+            text (str): Input text.
+
+        Returns:
+            str: Text with punctuation removed.
+        """
         return text.translate(str.maketrans("", "", string.punctuation))
 
     def _tokenize(self, text: str) -> List[str]:
-        """Tokenize text into a list of word tokens."""
+        """
+        Tokenize text into a list of word tokens.
+
+        Args:
+            text (str): Input text.
+
+        Returns:
+            List[str]: List of tokens.
+        """
         return word_tokenize(text=text)
 
     def _remove_stopwords(self, tokens: List[str]) -> List[str]:
-        """Remove common English stop words from a list of tokens."""
+        """
+        Remove common English stop words from a list of tokens.
+
+        Args:
+            tokens (List[str]): List of input tokens.
+
+        Returns:
+            List[str]: List of tokens with stop words removed.
+        """
         return [w for w in tokens if w not in self.stop_words]
 
     def _lemmatize_tokens(self, tokens: List[str]) -> List[str]:
-        """Lemmatize tokens using WordNet lemmatizer."""
+        """
+        Lemmatize tokens using WordNet lemmatizer.
+
+        Args:
+            tokens (List[str]): List of input tokens.
+
+        Returns:
+            List[str]: List of lemmatized tokens.
+        """
         return [self.lemmatizer.lemmatize(w) for w in tokens]
 
     def _preprocess_text(self, text: str) -> str:

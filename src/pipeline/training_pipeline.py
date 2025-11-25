@@ -1,18 +1,21 @@
 import os
 import sys
 from src.exception import MyException
+from src.logger import logging
 from src.utils.main_utils import read_yaml_file
 from src.data.data_ingestion import DataIngestion
 from src.data.data_preprocessing import DataPreprocessing
 from src.features.feature_engineering import FeatureEngineering
 from src.model.model_training import ModelTraining
 from src.model.model_evaluation import ModelEvaluation
+from src.model.model_registration import ModelRegistration
 from src.entity.config_entity import (
     DataIngestionConfig,
     DataPreprocessingConfig,
     FeatureEngineeringConfig,
     ModelTrainingConfig,
     ModelEvaluationConfig,
+    ModelRegistrationConfig,
 )
 from src.entity.artifact_entity import (
     DataIngestionArtifacts,
@@ -29,17 +32,27 @@ class TrainPipeline:
     """
     Orchestrates execution of the end-to-end training pipeline.
 
+    Responsibilities:
+        - Configure and initialize all pipeline stages.
+        - Execute stages sequentially: Ingestion -> Preprocessing -> Feature Engineering -> Training -> Evaluation -> Registration.
+        - Pass artifacts between stages.
+
     Stages:
         1. Data Ingestion
         2. Data Preprocessing
         3. Feature Engineering
         4. Model Training
+        5. Model Evaluation
+        6. Model Registration
     """
 
     def __init__(self) -> None:
         """
         Initialize the TrainPipeline by constructing stage configurations
         from params.yaml.
+
+        Raises:
+            MyException: If initialization fails.
         """
         try:
             params = read_yaml_file(filepath="params.yaml")
@@ -76,6 +89,12 @@ class TrainPipeline:
                 target=str(params["model_training"]["target"]),
             )
 
+            self.model_registration_config: ModelRegistrationConfig = (
+                ModelRegistrationConfig(
+                    target=str(params["model_training"]["target"]),
+                )
+            )
+
         except Exception as e:
             raise MyException(e, sys) from e
 
@@ -85,6 +104,9 @@ class TrainPipeline:
 
         Returns:
             DataIngestionArtifacts: Paths to the ingested training and testing datasets.
+
+        Raises:
+            MyException: If data ingestion fails.
         """
         try:
             data_ingestor: DataIngestion = DataIngestion(
@@ -105,6 +127,9 @@ class TrainPipeline:
 
         Returns:
             DataPreprocessingArtifacts: Paths to the interim (preprocessed) train/test CSVs.
+
+        Raises:
+            MyException: If data preprocessing fails.
         """
         try:
             data_preprocessor: DataPreprocessing = DataPreprocessing(
@@ -126,6 +151,9 @@ class TrainPipeline:
 
         Returns:
             FeatureEngineeringArtifacts: Paths to processed train/test data and vectorizer.
+
+        Raises:
+            MyException: If feature engineering fails.
         """
         try:
             feature_engineer: FeatureEngineering = FeatureEngineering(
@@ -147,6 +175,9 @@ class TrainPipeline:
 
         Returns:
             ModelTrainingArtifacts: Path to the persisted trained model.
+
+        Raises:
+            MyException: If model training fails.
         """
         try:
             model_trainer: ModelTraining = ModelTraining(
@@ -168,6 +199,9 @@ class TrainPipeline:
 
         Returns:
             ModelEvaluationArtifacts: Paths to the metrics and model info reports.
+
+        Raises:
+            MyException: If model evaluation fails.
         """
         try:
             model_evaluator: ModelEvaluation = ModelEvaluation(
@@ -182,55 +216,81 @@ class TrainPipeline:
         except Exception as e:
             raise MyException(e, sys) from e
 
+    def start_model_registration(self) -> None:
+        """
+        Run the model registration stage of the pipeline.
+
+        Returns:
+            None
+
+        Raises:
+            MyException: If model registration fails.
+        """
+        try:
+            model_register: ModelRegistration = ModelRegistration(
+                model_registration_config=self.model_registration_config
+            )
+
+            model_register.initiate_model_registration()
+
+        except Exception as e:
+            raise MyException(e, sys) from e
+
     def run_pipeline(self) -> None:
         """
         Execute the full training pipeline in sequence.
+
+        Raises:
+            MyException: If the pipeline fails.
         """
         try:
             print("=" * terminal_width)
-            print(f"{'Training Pipeline':^{terminal_width}}")
+            logging.info("Training Pipeline")
             print("-" * terminal_width)
 
             # Stage 1: Data Ingestion
-            print(f"{'Stage 1: Data Ingestion':^{terminal_width}}")
+            logging.info("Stage 1: Data Ingestion")
             data_ingestion_artifacts: DataIngestionArtifacts = (
                 self.start_data_ingestion()
             )
             print("-" * terminal_width)
 
             # Stage 2: Data Preprocessing
-            print(f"{'Stage 2: Data Preprocessing':^{terminal_width}}")
+            logging.info("Stage 2: Data Preprocessing")
             data_preprocessing_artifacts: DataPreprocessingArtifacts = (
                 self.start_data_preprocessing()
             )
             print("-" * terminal_width)
 
             # Stage 3: Feature Engineering
-            print(f"{'Stage 3: Feature Engineering':^{terminal_width}}")
+            logging.info("Stage 3: Feature Engineering")
             feature_engineering_artifacts: FeatureEngineeringArtifacts = (
                 self.start_feature_engineering()
             )
             print("-" * terminal_width)
 
             # Stage 4: Model Training
-            print(f"{'Stage 4: Model Training':^{terminal_width}}")
+            logging.info("Stage 4: Model Training")
             model_training_artifacts: ModelTrainingArtifacts = (
                 self.start_model_training()
             )
             print("-" * terminal_width)
 
             # Stage 5: Model Evaluation
-            print(f"{'Stage 5: Model Evaluation':^{terminal_width}}")
-            model_evaluation_artifacts: ModelEvaluationArtifacts = (
-                self.start_model_evaluation()
-            )
+            logging.info("Stage 5: Model Evaluation")
+            self.start_model_evaluation()
             print("-" * terminal_width)
 
-            print(f"{'Training pipeline completed.':^{terminal_width}}")
+            # Stage 6: Model Registration
+            logging.info("Stage 6: Model Registration")
+            self.start_model_registration()
+            print("-" * terminal_width)
+
+            logging.info("Training pipeline completed.")
             print("=" * terminal_width)
 
         except Exception as e:
             print("=" * terminal_width)
-            print(f"{'Training pipeline failed!.':^{terminal_width}}")
+            logging.info("Training pipeline failed!")
             print("=" * terminal_width)
             raise MyException(e, sys) from e
