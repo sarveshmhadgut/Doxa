@@ -93,6 +93,7 @@ class PredictionPipeline:
             if not dagshub_token:
                 raise EnvironmentError("DAGSHUB_TOKEN is missing!")
             else:
+                dagshub_token = dagshub_token.strip()
                 dagshub.auth.add_app_token(dagshub_token)
 
             mlflow.set_tracking_uri(dagshub_uri)

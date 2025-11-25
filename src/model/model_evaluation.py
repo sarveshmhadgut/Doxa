@@ -102,7 +102,8 @@ class ModelEvaluation:
 
             mlflow.set_tracking_uri(dagshub_uri)
             if dagshub_token:
-                dagshub.auth.add_app_token(dagshub_token.strip())
+                dagshub_token = dagshub_token.strip()
+                dagshub.auth.add_app_token(dagshub_token)
 
             # with redirect_stdout(io.StringIO()):
             dagshub.init(
