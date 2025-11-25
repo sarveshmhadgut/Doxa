@@ -31,19 +31,15 @@ jobs:
     - name: Sync Dependencies
       run: uv sync --all-extras --dev
 
-    - name: DVC Pull
-      run: uv run dvc pull
-
     - name: Run DVC Pipeline
       run: uv run dvc repro -f
 
     - name: Run Model Tests
-      if: success()
       run: uv run tests/model_tests.py
 
-    - name: Promote Model
-      run: uv run src/model/model_promotion.py
-
     - name: Run App Tests
-      if: success()
       run: uv run tests/app_tests.py
+
+    - name: Promote Model
+      if: success()
+      run: uv run src/model/model_promotion.py

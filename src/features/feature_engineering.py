@@ -120,12 +120,14 @@ class FeatureEngineering:
                 text="Applying TF-IDF on interim training data...",
                 spinner="dots",
             ):
+                print(interim_X_train.head(20))
                 processed_X_train = vectorizer.fit_transform(interim_X_train)
 
             with Halo(
                 text="Applying TF-IDF on interim testing data...",
                 spinner="dots",
             ):
+                print(interim_X_test.head(20))
                 processed_X_test = vectorizer.transform(interim_X_test)
 
             feature_names: List[str] = [
