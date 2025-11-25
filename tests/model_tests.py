@@ -58,6 +58,7 @@ class TestModel(unittest.TestCase):
                 dagshub_uri=dagshub_uri,
                 dagshub_repo=dagshub_repo,
                 dagshub_username=dagshub_username,
+                dagshub_token=dagshub_token,
             )
 
             cls.new_model = cls.prediction_pipeline._load_model(REGISTRATION_MODEL_NAME)
