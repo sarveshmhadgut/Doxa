@@ -31,7 +31,7 @@ jobs:
     - name: Sync Dependencies
       run: uv sync --all-extras --dev
 
-    - name: DVC Pull (Download Dataset)
+    - name: DVC Pull
       run: uv run dvc pull
 
     - name: Run DVC Pipeline

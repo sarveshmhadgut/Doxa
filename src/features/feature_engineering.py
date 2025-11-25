@@ -130,6 +130,17 @@ class FeatureEngineering:
                     sys,
                 )
 
+            non_empty_count = sum(bool(str(x).strip()) for x in interim_X_train)
+            if non_empty_count == 0:
+                sample_rows = train_df.head(5).to_dict(orient="records")
+                raise MyException(
+                    Exception(
+                        f"TF-IDF failure: no non-empty documents found in training feature '{feature}'. "
+                        f"Please check DVC artifacts / preprocessing. sample_rows={sample_rows}"
+                    ),
+                    sys,
+                )
+
             vectorizer: TfidfVectorizer = TfidfVectorizer(
                 max_features=max_features,
                 ngram_range=(1, 2),
