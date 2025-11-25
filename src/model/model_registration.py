@@ -1,15 +1,12 @@
 import os
-import io
 import sys
 import json
 import mlflow
-import dagshub
 from halo import Halo
 from typing import Dict
 from dotenv import load_dotenv
 from src.logger import logging
 from src.exception import MyException
-from contextlib import redirect_stdout
 from mlflow.tracking import MlflowClient
 from src.entity.config_entity import ModelRegistrationConfig
 from src.constants import (

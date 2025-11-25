@@ -89,10 +89,10 @@ class FeatureEngineering:
             MyException: If feature engineering fails.
         """
         try:
-            interim_X_train: ndarray = train_df[feature].values
+            interim_X_train: ndarray = train_df[feature].fillna("").values
             interim_y_train: ndarray = train_df[target].values
 
-            interim_X_test: ndarray = test_df[feature].values
+            interim_X_test: ndarray = test_df[feature].fillna("").values
             interim_y_test: ndarray = test_df[target].values
 
             vectorizer: TfidfVectorizer = TfidfVectorizer(
