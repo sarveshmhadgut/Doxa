@@ -35,7 +35,7 @@ jobs:
       run: uv run dvc pull
 
     - name: Run DVC Pipeline
-      run: uv run dvc repro
+      run: uv run dvc repro -f
 
     - name: Run Model Tests
       if: success()
