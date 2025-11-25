@@ -98,7 +98,7 @@ class FeatureEngineering:
             vectorizer: TfidfVectorizer = TfidfVectorizer(
                 max_features=max_features,
                 ngram_range=(1, 2),
-                min_df=2,
+                min_df=1,
                 max_df=0.95,
                 sublinear_tf=True,
             )
