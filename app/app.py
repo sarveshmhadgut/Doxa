@@ -70,4 +70,4 @@ def metrics():
 
 if __name__ == "__main__":
     print("Starting Flask app...", flush=True)
-    app.run(debug=True, host="0.0.0.0", port=8080)
+    app.run(debug=False, host="0.0.0.0", port=8080)
