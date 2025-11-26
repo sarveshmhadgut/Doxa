@@ -133,6 +133,7 @@ jobs:
 
     - name: Create Secrets
       run: |
+        kubectl delete secret app-secrets --ignore-not-found
         kubectl create secret generic app-secrets \
           --from-literal=DAGSHUB_URI=${{ secrets.DAGSHUB_URI }} \
           --from-literal=DAGSHUB_USERNAME=${{ secrets.DAGSHUB_USERNAME }} \
@@ -140,8 +141,7 @@ jobs:
           --from-literal=DAGSHUB_REPO=${{ secrets.DAGSHUB_REPO }} \
           --from-literal=AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
           --from-literal=AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
-          --from-literal=AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }} \
-          --dry-run=client -o yaml | kubectl apply -f -
+          --from-literal=AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }}
 
     - name: EKS Deployment
       env:
