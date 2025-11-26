@@ -55,7 +55,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
     - name: Download Vectorizer Artifact
       uses: actions/download-artifact@v4
@@ -110,7 +111,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
     - name: Configure AWS
       uses: aws-actions/configure-aws-credentials@v4
@@ -129,7 +131,7 @@ jobs:
             --region ${{ secrets.AWS_DEFAULT_REGION }} \
             --name doxa-app-cluster
 
-    - name: Create Secret
+    - name: Create Secrets
       run: |
         kubectl create secret generic app-secrets \
           --from-literal=DAGSHUB_URI=${{ secrets.DAGSHUB_URI }} \
@@ -141,7 +143,7 @@ jobs:
           --from-literal=AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }} \
           --dry-run=client -o yaml | kubectl apply -f -
 
-    - name: Deploy to EKS
+    - name: EKS Deployment
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
