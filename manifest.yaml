@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doxa-app
+  labels:
+    app: doxa-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: doxa-app
+  template:
+    metadata:
+      labels:
+        app: doxa-app
+    spec:
+      containers:
+      - name: doxa-app
+        image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+        envFrom:
+        - secretRef:
+            name: app-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: doxa-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: doxa-app
+  ports:
+  - port: 80
+    targetPort: 8080

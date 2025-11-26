@@ -104,3 +104,47 @@ jobs:
       run: |
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+    - name: Login to ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig \
+            --region ${{ secrets.AWS_DEFAULT_REGION }} \
+            --name doxa-app-cluster
+
+    - name: Create Secret
+      run: |
+        kubectl create secret generic app-secrets \
+          --from-literal=DAGSHUB_URI=${{ secrets.DAGSHUB_URI }} \
+          --from-literal=DAGSHUB_USERNAME=${{ secrets.DAGSHUB_USERNAME }} \
+          --from-literal=DAGSHUB_TOKEN=${{ secrets.DAGSHUB_TOKEN }} \
+          --from-literal=DAGSHUB_REPO=${{ secrets.DAGSHUB_REPO }} \
+          --from-literal=AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+          --from-literal=AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+          --from-literal=AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }} \
+          --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Deploy to EKS
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        envsubst < manifest.yaml | kubectl apply -f -
