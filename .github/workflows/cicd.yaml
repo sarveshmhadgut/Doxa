@@ -35,11 +35,50 @@ jobs:
       run: uv run dvc repro
 
     - name: Run Model Tests
-      run: uv run tests/model_tests.py
+      run: uv run python tests/model_tests.py
 
     - name: Run App Tests
-      run: uv run tests/app_tests.py
+      run: uv run python tests/app_tests.py
 
     - name: Promote Model
       if: success()
-      run: uv run src/model/model_promotion.py
+      run: uv run python src/model/model_promotion.py
+
+    - name: Upload Vectorizer Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vectorizer
+        path: models/vectorizer.pkl
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download Vectorizer Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: vectorizer
+        path: models
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: app
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
