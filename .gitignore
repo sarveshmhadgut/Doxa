@@ -11,7 +11,7 @@ local_s3/
 flow.txt
 notebooks/*.csv
 test.ipynb
-
+*.pem
 # DVC
 /data
 /models
