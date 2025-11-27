@@ -131,7 +131,10 @@ class PredictionPipeline:
         try:
             client: MlflowClient = mlflow.MlflowClient()
 
-            stage_priority: List[str] = ["Production", "Staging"]
+            stage_env = os.getenv("MLFLOW_STAGE")
+            stage_priority: List[str] = (
+                [stage_env] if stage_env else ["Production", "Staging"]
+            )
 
             for stage in stage_priority:
                 versions: List[ModelVersion] = client.search_model_versions(
