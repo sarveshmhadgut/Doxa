@@ -47,6 +47,8 @@ class DataPreprocessing:
         try:
             self.lemmatizer: WordNetLemmatizer = WordNetLemmatizer()
             self.stop_words: set = set(stopwords.words("english"))
+            for keep in ("not", "no", "nor", "n't"):
+                self.stop_words.discard(keep)
 
             if data_preprocessing_config is None:
                 params: dict = read_yaml_file(filepath="params.yaml")

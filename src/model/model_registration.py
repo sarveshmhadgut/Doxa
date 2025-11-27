@@ -3,7 +3,6 @@ import sys
 import json
 import mlflow
 import dagshub
-from halo import Halo
 from typing import Dict
 from dotenv import load_dotenv
 from src.logger import logging
@@ -78,20 +77,17 @@ class ModelRegistration:
         try:
             logging.getLogger().setLevel(logging.WARNING)
 
-            with Halo(text="Connecting to Dagshub...", spinner="dots"):
-                # Set environment variables for MLflow authentication
-                dagshub_token = os.getenv("DAGSHUB_TOKEN")
-                if dagshub_token:
-                    dagshub_token = dagshub_token.strip()
-
-                os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_username
-                os.environ["MLFLOW_TRACKING_PASSWORD"] = (
-                    dagshub_token if dagshub_token else ""
-                )
-
-                mlflow.set_tracking_uri(dagshub_uri)
-                if dagshub_token:
-                    dagshub.auth.add_app_token(dagshub_token)
+            # Set environment variables for MLflow authentication
+            dagshub_token = os.getenv("DAGSHUB_TOKEN")
+            if dagshub_token:
+                dagshub_token = dagshub_token.strip()
+            os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_username
+            os.environ["MLFLOW_TRACKING_PASSWORD"] = (
+                dagshub_token if dagshub_token else ""
+            )
+            mlflow.set_tracking_uri(dagshub_uri)
+            if dagshub_token:
+                dagshub.auth.add_app_token(dagshub_token)
 
         except Exception as e:
             raise MyException(e, sys) from e
@@ -137,15 +133,14 @@ class ModelRegistration:
                 model_uri=model_uri, name=model_name
             )
 
-            with Halo(text="Registering Model...", spinner="dots"):
-                client: MlflowClient = mlflow.tracking.MlflowClient()
+            client: MlflowClient = mlflow.tracking.MlflowClient()
 
-                client.set_model_version_tag(
-                    name=model_name,
-                    version=registered_model.version,
-                    key="stage",
-                    value="Staging",
-                )
+            client.set_model_version_tag(
+                name=model_name,
+                version=registered_model.version,
+                key="stage",
+                value="Staging",
+            )
 
         except Exception as e:
             raise MyException(e, sys) from e

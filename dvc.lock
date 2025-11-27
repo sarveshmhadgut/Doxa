@@ -5,36 +5,36 @@ stages:
     deps:
     - path: src/data/data_ingestion.py
       hash: md5
-      md5: dc96d8b54b13ae7a0011b206fc944826
-      size: 8472
+      md5: b39c6915670ae302919e662a519137de
+      size: 8434
     params:
       params.yaml:
         data_ingestion.random_state: 42
-        data_ingestion.s3_dataset: sample.csv
+        data_ingestion.s3_dataset: imdb.csv
         data_ingestion.test_size: 0.2
     outs:
     - path: data/raw
       hash: md5
-      md5: af681a27bb74ead2f63fad6aac0cc43c.dir
-      size: 15870615
+      md5: 6882d357e449c60e331ef549ba7ec1c2.dir
+      size: 65715224
       nfiles: 2
   data_preprocessing:
     cmd: uv run src/data/data_preprocessing.py
     deps:
     - path: data/raw
       hash: md5
-      md5: af681a27bb74ead2f63fad6aac0cc43c.dir
-      size: 15870615
+      md5: 6882d357e449c60e331ef549ba7ec1c2.dir
+      size: 65715224
       nfiles: 2
     - path: src/constants/
       hash: md5
-      md5: 1fcbb37f98e6e749a896bc0900941501.dir
-      size: 1266
+      md5: 3103715e3fc591ba420869e9b5ab05b3.dir
+      size: 1264
       nfiles: 1
     - path: src/data/data_preprocessing.py
       hash: md5
-      md5: b7b33180599fb412cb6d9d740124a52d
-      size: 10108
+      md5: 2bf71740a45976a9ae347be5ea6eb8ac
+      size: 10207
     params:
       params.yaml:
         data_preprocessing.features:
@@ -43,92 +43,100 @@ stages:
     outs:
     - path: data/interim
       hash: md5
-      md5: cf7f1bcf9fce39ff37d7c1dc9006ae86.dir
-      size: 9880233
+      md5: aa97555a42ea1e6cc890b5ef7cb1c4ee.dir
+      size: 41214939
       nfiles: 2
   feature_engineering:
     cmd: uv run src/features/feature_engineering.py
     deps:
     - path: data/interim
       hash: md5
-      md5: cf7f1bcf9fce39ff37d7c1dc9006ae86.dir
-      size: 9880233
+      md5: aa97555a42ea1e6cc890b5ef7cb1c4ee.dir
+      size: 41214939
       nfiles: 2
     - path: src/features/feature_engineering.py
       hash: md5
-      md5: 10a19a47a0987e16d4d8c9b33d0e1a8a
-      size: 8921
+      md5: 92a9db31ed7b7fbf1bd4acc5e6e686f9
+      size: 8765
     params:
       params.yaml:
         data_preprocessing.target: sentiment
         feature_engineering.feature: review
-        feature_engineering.max_features: 1000
+        feature_engineering.max_features: 10000
     outs:
     - path: data/processed
       hash: md5
-      md5: 1a6bfe5655905c130e11d8374a0447c4.dir
-      size: 58481416
+      md5: 4f73f127cce1473e7ff121534603c0e1.dir
+      size: 2052866117
       nfiles: 2
     - path: models/vectorizer.pkl
       hash: md5
-      md5: cf8a9be1596e2c3943d782d5c535e6bc
-      size: 36635
+      md5: d3f83263dd6cc5f3e5c57712e8646b32
+      size: 368091
   model_training:
     cmd: uv run src/model/model_training.py
     deps:
     - path: data/processed
       hash: md5
-      md5: 1a6bfe5655905c130e11d8374a0447c4.dir
-      size: 58481416
+      md5: 4f73f127cce1473e7ff121534603c0e1.dir
+      size: 2052866117
       nfiles: 2
+    - path: models/vectorizer.pkl
+      hash: md5
+      md5: d3f83263dd6cc5f3e5c57712e8646b32
+      size: 368091
     - path: src/model/model_training.py
       hash: md5
-      md5: a084701bbb51a45edaad187c106c4db6
-      size: 6304
+      md5: 804198a7b5c3da297323bc17ac687969
+      size: 6088
     params:
       params.yaml:
-        model_training.c: 10
-        model_training.max_iter: 1000
-        model_training.penalty: l2
+        model_training.c: 1
+        model_training.max_iter: 10000
+        model_training.penalty: l1
         model_training.solver: liblinear
         model_training.target: label
     outs:
     - path: models/model.pkl
       hash: md5
-      md5: a720b39bc779f9ab3de57b2bc21d6581
-      size: 22766
+      md5: c23e2c324ae46c9fe7a6219ed2f98f71
+      size: 229811
   model_evaluation:
     cmd: uv run src/model/model_evaluation.py
     deps:
     - path: data/processed
       hash: md5
-      md5: 1a6bfe5655905c130e11d8374a0447c4.dir
-      size: 58481416
+      md5: 4f73f127cce1473e7ff121534603c0e1.dir
+      size: 2052866117
       nfiles: 2
+    - path: models/model.pkl
+      hash: md5
+      md5: c23e2c324ae46c9fe7a6219ed2f98f71
+      size: 229811
     - path: src/model/model_evaluation.py
       hash: md5
-      md5: 34233c618440f74609046e73f26da65e
-      size: 10466
+      md5: 126dbb6ad449fe3638b31c0f1d927237
+      size: 10512
     params:
       params.yaml:
         model_training.target: label
     outs:
     - path: reports/metrics.json
       hash: md5
-      md5: 9d5fa37dd8467786ba539f43c8078d7d
-      size: 215
+      md5: 60d077dac52ef997ee67f1ac75a01735
+      size: 216
     - path: reports/model_info.json
       hash: md5
-      md5: 861d9a657bd5caf7d325a617565e13c9
+      md5: b9e20fb6a42c422d4f6fb8916a5be16c
       size: 90
   model_registration:
     cmd: uv run src/model/model_registration.py
     deps:
     - path: reports/model_info.json
       hash: md5
-      md5: 861d9a657bd5caf7d325a617565e13c9
+      md5: b9e20fb6a42c422d4f6fb8916a5be16c
       size: 90
     - path: src/model/model_registration.py
       hash: md5
-      md5: 78945fedfa9af064c393c3445fa6e741
-      size: 6927
+      md5: 0edee08bc76de4d93b73c1ba5d4e92e8
+      size: 6691

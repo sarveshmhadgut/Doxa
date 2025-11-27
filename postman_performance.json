@@ -1,0 +1,273 @@
+{
+    "info": {
+        "name": "Doxa Performance Collection (updated)",
+        "description": "Postman collection to run lightweight performance checks against the Doxa app. Contains GET / (home) and POST /predict requests with assertions and simple timing/metrics recorded into environment variables so you can run with Collection Runner or Newman.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "version": {
+            "major": 1,
+            "minor": 0,
+            "patch": 1
+        }
+    },
+    "item": [
+        {
+            "name": "Load Test Runner",
+            "description": "Folder for repeated GET and POST requests used for load/perf checks.",
+            "item": [
+                {
+                    "name": "GET / (home)",
+                    "request": {
+                        "method": "GET",
+                        "header": [ ],
+                        "url": {
+                            "raw": "{{base_url}}/",
+                            "host": [ "{{base_url}}" ],
+                            "path": [ "" ]
+                        },
+                        "description": "Fetch the home page. Expect 200 and check for title or app name."
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// record request start time in environment for later measurement",
+                                    "pm.environment.set('req_start_time', Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const start = Number(pm.environment.get('req_start_time') || Date.now());",
+                                    "const elapsed = Date.now() - start;",
+                                    "",
+                                    "// basic checks",
+                                    "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                                    "pm.test('Home contains app title or name', function () {",
+                                    "    const body = pm.response.text();",
+                                    "    pm.expect(body).to.be.a('string');",
+                                    "    pm.expect(body).to.satisfy(function (b) { return b.includes('<title>Doxa</title>') || b.includes('Doxa') || b.includes('Sentiment'); });",
+                                    "});",
+                                    "",
+                                    "// accumulate metrics in env variables (counts and response times)",
+                                    "const totalRequests = Number(pm.environment.get('perf_total_requests') || 0) + 1;",
+                                    "const totalTime = Number(pm.environment.get('perf_total_time_ms') || 0) + elapsed;",
+                                    "const maxTime = Math.max(Number(pm.environment.get('perf_max_time_ms') || 0), elapsed);",
+                                    "const minTimePrev = pm.environment.get('perf_min_time_ms');",
+                                    "const minTime = (minTimePrev === undefined || minTimePrev === null) ? elapsed : Math.min(Number(minTimePrev), elapsed);",
+                                    "pm.environment.set('perf_total_requests', totalRequests);",
+                                    "pm.environment.set('perf_total_time_ms', totalTime);",
+                                    "pm.environment.set('perf_max_time_ms', maxTime);",
+                                    "pm.environment.set('perf_min_time_ms', minTime);",
+                                    "",
+                                    "// last status and last elapsed",
+                                    "pm.environment.set('perf_last_status', pm.response.code);",
+                                    "pm.environment.set('perf_last_time_ms', elapsed);",
+                                    "",
+                                    "// print a short summary to the runner output",
+                                    "console.log(`[perf] GET / -> status=${pm.response.code} time=${elapsed}ms total=${totalRequests}`);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "POST /predict",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/x-www-form-urlencoded"
+                            }
+                        ],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "text",
+                                    "value": "{{sample_text}}",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/predict",
+                            "host": [ "{{base_url}}" ],
+                            "path": [ "predict" ]
+                        },
+                        "description": "Submit text for sentiment prediction. Expect 200 with Positive/Negative (but accept 400/422 in case of validation errors)."
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// rotate/generate a random sample text for variability",
+                                    "const samples = [",
+                                    "  'I love this product! It works great and exceeded expectations.',",
+                                    "  'This is awful, really disappointed.',",
+                                    "  'Not bad, could be better.',",
+                                    "  'Exceptional experience - would recommend!',",
+                                    "  'Terrible service, will not use it again.'",
+                                    "];",
+                                    "const text = samples[Math.floor(Math.random()*samples.length)];",
+                                    "pm.environment.set('sample_text', text);",
+                                    "pm.environment.set('req_start_time', Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const start = Number(pm.environment.get('req_start_time') || Date.now());",
+                                    "const elapsed = Date.now() - start;",
+                                    "",
+                                    "// Accept 200 (normal) or 400/422 if body validation fails in the app - still record metrics",
+                                    "pm.test('Status is 200 or 4xx (validation)', function () {",
+                                    "  pm.expect([200, 400, 422]).to.include(pm.response.code);",
+                                    "});",
+                                    "",
+                                    "// Check for sentiment keywords if 200",
+                                    "if (pm.response.code === 200) {",
+                                    "  const body = pm.response.text();",
+                                    "  pm.test('Response contains Positive or Negative or GIF paths', function () {",
+                                    "    pm.expect(body).to.satisfy(function (b) {",
+                                    "      return b.includes('Positive') || b.includes('Negative') || b.includes('homer_from_the_bush') || b.includes('homer_into_bush');",
+                                    "    });",
+                                    "  });",
+                                    "}",
+                                    "",
+                                    "// accumulate metrics in env variables (counts and response times)",
+                                    "const totalRequests = Number(pm.environment.get('perf_total_requests') || 0) + 1;",
+                                    "const totalTime = Number(pm.environment.get('perf_total_time_ms') || 0) + elapsed;",
+                                    "const maxTime = Math.max(Number(pm.environment.get('perf_max_time_ms') || 0), elapsed);",
+                                    "const minTimePrev = pm.environment.get('perf_min_time_ms');",
+                                    "const minTime = (minTimePrev === undefined || minTimePrev === null) ? elapsed : Math.min(Number(minTimePrev), elapsed);",
+                                    "const successCount = Number(pm.environment.get('perf_success_count') || 0) + (pm.response.code === 200 ? 1 : 0);",
+                                    "pm.environment.set('perf_total_requests', totalRequests);",
+                                    "pm.environment.set('perf_total_time_ms', totalTime);",
+                                    "pm.environment.set('perf_max_time_ms', maxTime);",
+                                    "pm.environment.set('perf_min_time_ms', minTime);",
+                                    "pm.environment.set('perf_success_count', successCount);",
+                                    "",
+                                    "pm.environment.set('perf_last_status', pm.response.code);",
+                                    "pm.environment.set('perf_last_time_ms', elapsed);",
+                                    "console.log(`[perf] POST /predict -> status=${pm.response.code} time=${elapsed}ms total=${totalRequests} successes=${successCount}`);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+
+        {
+            "name": "Summary / Metrics",
+            "request": {
+                "method": "GET",
+                "header": [ ],
+                "url": {
+                    "raw": "https://postman-echo.com/get?show_metrics=true",
+                    "protocol": "https",
+                    "host": [ "postman-echo", "com" ],
+                    "path": [ "get" ],
+                    "query": [
+                        {
+                            "key": "show_metrics",
+                            "value": "true"
+                        }
+                    ]
+                },
+                "description": "A helper request you can run after a set of iterations to dump metrics stored in environment variables (uses postman-echo for demo; you can instead inspect environment variables locally)."
+            },
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "// build a small metrics object from env variables and attach as header so it's visible in the runner console",
+                            "const metrics = {",
+                            "  total_requests: Number(pm.environment.get('perf_total_requests') || 0),",
+                            "  total_time_ms: Number(pm.environment.get('perf_total_time_ms') || 0),",
+                            "  avg_time_ms: (Number(pm.environment.get('perf_total_requests') || 0) === 0) ? 0 : Number(pm.environment.get('perf_total_time_ms') || 0) / Number(pm.environment.get('perf_total_requests') || 0),",
+                            "  min_time_ms: Number(pm.environment.get('perf_min_time_ms') || 0),",
+                            "  max_time_ms: Number(pm.environment.get('perf_max_time_ms') || 0),",
+                            "  last_status: Number(pm.environment.get('perf_last_status') || 0),",
+                            "  success_count: Number(pm.environment.get('perf_success_count') || 0)",
+                            "};",
+                            "pm.request.headers.add({ key: 'X-Perf-Metrics', value: JSON.stringify(metrics) });",
+                            "console.log('[perf-summary] ', metrics);"
+                        ]
+                    }
+                },
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test('Returned echo', function () { pm.response.to.have.status(200); });",
+                            "console.log('Run complete — check X-Perf-Metrics header printed in request details and console.');"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "event": [ ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8080",
+            "type": "string"
+        },
+        {
+            "key": "sample_text",
+            "value": "I love this service!",
+            "type": "string"
+        },
+        {
+            "key": "perf_total_requests",
+            "value": "0",
+            "type": "string"
+        },
+        {
+            "key": "perf_total_time_ms",
+            "value": "0",
+            "type": "string"
+        },
+        {
+            "key": "perf_max_time_ms",
+            "value": "0",
+            "type": "string"
+        },
+        {
+            "key": "perf_min_time_ms",
+            "value": "0",
+            "type": "string"
+        },
+        {
+            "key": "perf_last_status",
+            "value": "0",
+            "type": "string"
+        },
+        {
+            "key": "perf_last_time_ms",
+            "value": "0",
+            "type": "string"
+        },
+        {
+            "key": "perf_success_count",
+            "value": "0",
+            "type": "string"
+        }
+    ]
+}

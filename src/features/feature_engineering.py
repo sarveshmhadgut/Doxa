@@ -94,13 +94,7 @@ class FeatureEngineering:
             interim_X_test: List[str] = test_df[feature].values
             interim_y_test: ndarray = test_df[target].values
 
-            vectorizer: TfidfVectorizer = TfidfVectorizer(
-                max_features=max_features,
-                ngram_range=(1, 2),
-                min_df=1,
-                max_df=1.0,
-                sublinear_tf=True,
-            )
+            vectorizer: TfidfVectorizer = TfidfVectorizer(max_features=max_features)
 
             processed_X_train = vectorizer.fit_transform(interim_X_train)
 

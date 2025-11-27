@@ -13,7 +13,6 @@ stages:
   data_preprocessing:
     cmd: uv run src/data/data_preprocessing.py
     deps:
-    - src/constants/
     - data/raw
     - src/data/data_preprocessing.py
     params:
@@ -39,6 +38,7 @@ stages:
     cmd: uv run src/model/model_training.py
     deps:
     - data/processed
+    - models/vectorizer.pkl
     - src/model/model_training.py
     params:
     - model_training.target
@@ -53,6 +53,7 @@ stages:
     cmd: uv run src/model/model_evaluation.py
     deps:
     - data/processed
+    - models/model.pkl
     - src/model/model_evaluation.py
     params:
     - model_training.target

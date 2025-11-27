@@ -29,7 +29,7 @@ class DataIngestion:
     Responsibilities:
         - Load ingestion hyperparameters from params.yaml.
         - Fetch dataset from S3.
-        - Apply primitive preprocessing (duplicates removal, label filtering).
+        - Apply primitive preprocessing.
         - Split into train/test sets.
         - Persist splits to disk and return artifact metadata.
     """

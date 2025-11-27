@@ -1,6 +1,5 @@
 import sys
 import pandas as pd
-from halo import Halo
 from typing import Optional
 from src.logger import logging
 from src.exception import MyException
@@ -91,8 +90,7 @@ class ModelTraining:
                 max_iter=max_iter,
             )
 
-            with Halo(text="Training model...", spinner="dots"):
-                model.fit(X=X_train, y=y_train)
+            model.fit(X=X_train, y=y_train)
 
             return model
 
@@ -122,10 +120,7 @@ class ModelTraining:
             )
             logging.info("Fetching processed training data...")
 
-            with Halo(text="Fetching processed training data...", spinner="dots"):
-                processed_train_df: pd.DataFrame = read_csv_file(
-                    processed_train_filepath
-                )
+            processed_train_df: pd.DataFrame = read_csv_file(processed_train_filepath)
 
             logging.info("Training model...")
             target: str = self.model_training_config.target
