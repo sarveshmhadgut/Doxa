@@ -26,11 +26,6 @@ stages:
       md5: 6882d357e449c60e331ef549ba7ec1c2.dir
       size: 65715224
       nfiles: 2
-    - path: src/constants/
-      hash: md5
-      md5: 3103715e3fc591ba420869e9b5ab05b3.dir
-      size: 1264
-      nfiles: 1
     - path: src/data/data_preprocessing.py
       hash: md5
       md5: 2bf71740a45976a9ae347be5ea6eb8ac

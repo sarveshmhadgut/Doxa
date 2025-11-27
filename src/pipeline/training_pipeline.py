@@ -90,9 +90,7 @@ class TrainPipeline:
             )
 
             self.model_registration_config: ModelRegistrationConfig = (
-                ModelRegistrationConfig(
-                    target=str(params["model_training"]["target"]),
-                )
+                ModelRegistrationConfig()
             )
 
         except Exception as e:

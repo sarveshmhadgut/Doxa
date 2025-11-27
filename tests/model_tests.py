@@ -139,10 +139,10 @@ class TestModel(unittest.TestCase):
         recall_new = recall_score(y_holdout, y_hat_new)
         f1_new = f1_score(y_holdout, y_hat_new)
 
-        expected_accuracy = 0.60
-        expected_precision = 0.60
-        expected_recall = 0.60
-        expected_f1 = 0.60
+        expected_accuracy = 0.80
+        expected_precision = 0.80
+        expected_recall = 0.80
+        expected_f1 = 0.80
 
         self.assertGreaterEqual(
             accuracy_new,
