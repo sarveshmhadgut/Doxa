@@ -66,7 +66,7 @@ stages:
       nfiles: 2
     - path: models/vectorizer.pkl
       hash: md5
-      md5: d3f83263dd6cc5f3e5c57712e8646b32
+      md5: ab19d88ae41b2af37b28d4d2b95a3e68
       size: 368091
   model_training:
     cmd: uv run src/model/model_training.py
@@ -78,7 +78,7 @@ stages:
       nfiles: 2
     - path: models/vectorizer.pkl
       hash: md5
-      md5: d3f83263dd6cc5f3e5c57712e8646b32
+      md5: ab19d88ae41b2af37b28d4d2b95a3e68
       size: 368091
     - path: src/model/model_training.py
       hash: md5
@@ -94,7 +94,7 @@ stages:
     outs:
     - path: models/model.pkl
       hash: md5
-      md5: c23e2c324ae46c9fe7a6219ed2f98f71
+      md5: 18c3fc2cb9d7d3c240426c02c4de0868
       size: 229811
   model_evaluation:
     cmd: uv run src/model/model_evaluation.py
@@ -106,7 +106,7 @@ stages:
       nfiles: 2
     - path: models/model.pkl
       hash: md5
-      md5: c23e2c324ae46c9fe7a6219ed2f98f71
+      md5: 18c3fc2cb9d7d3c240426c02c4de0868
       size: 229811
     - path: src/model/model_evaluation.py
       hash: md5
@@ -118,18 +118,18 @@ stages:
     outs:
     - path: reports/metrics.json
       hash: md5
-      md5: 60d077dac52ef997ee67f1ac75a01735
-      size: 216
+      md5: a231ad4d3a64e35083c24634cfb06dc6
+      size: 215
     - path: reports/model_info.json
       hash: md5
-      md5: b9e20fb6a42c422d4f6fb8916a5be16c
+      md5: 78789603bc1d6fdfb19197924fa65069
       size: 90
   model_registration:
     cmd: uv run src/model/model_registration.py
     deps:
     - path: reports/model_info.json
       hash: md5
-      md5: b9e20fb6a42c422d4f6fb8916a5be16c
+      md5: 78789603bc1d6fdfb19197924fa65069
       size: 90
     - path: src/model/model_registration.py
       hash: md5
