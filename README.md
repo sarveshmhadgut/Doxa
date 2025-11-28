@@ -1,6 +1,6 @@
 # Doxa – IMDb Sentiment Analysis MLOps Pipeline
 
-An end-to-end MLOps pipeline for predicting sentiment on IMDb reviews with automated CI/CD deployment and comprehensive monitoring.
+End-to-end MLOps pipeline for IMDb sentiment classification, incorporating data versioning, experiment tracking, automated CI/CD workflow and comprehensive monitoring.
 
 ## Table of Contents
 
