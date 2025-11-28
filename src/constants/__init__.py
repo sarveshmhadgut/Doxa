@@ -41,4 +41,4 @@ METRICS_FILENAME: str = "metrics.json"
 MODEL_INFO_FILENAME: str = "model_info.json"
 
 # model registration
-REGISTRATION_MODEL_NAME: str = "sentiment_clf"
+REGISTRATION_MODEL_NAME: str = "doxa_classifier"

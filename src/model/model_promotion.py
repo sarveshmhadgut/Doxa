@@ -3,8 +3,9 @@ import sys
 import mlflow
 import dagshub
 from dotenv import load_dotenv
+from datetime import datetime
 from src.logger import logging
-from typing import List, Optional
+from typing import Optional
 from src.exception import MyException
 from mlflow.tracking.client import MlflowClient
 from mlflow.entities.model_registry import ModelVersion
@@ -84,7 +85,6 @@ class ModelPromotion:
 
             dagshub_token = dagshub_token.strip()
 
-            # Set environment variables for MLflow authentication
             os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_username
             os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
@@ -97,101 +97,109 @@ class ModelPromotion:
         except Exception as e:
             raise MyException(e, sys) from e
 
-    def _archive_production_models(self, model_name: str, client: MlflowClient) -> None:
+    def _archive_current_champion(
+        self, model_name: str, client: MlflowClient, new_champion_version: str
+    ) -> None:
         """
-        Searches for all models currently tagged 'Production' and archives them by
-        setting their tag to 'Archived'.
+        Archives the current champion model if it exists and is different from the new champion.
+
+        This involves:
+        1. Setting the 'stage' tag to 'Archived'.
+        2. Removing the 'champion' alias.
+        3. Updating the model description with an archival timestamp.
 
         Args:
             model_name (str): The name of the registered model.
             client (MlflowClient): The initialized MLflow client.
-
-        Raises:
-            MyException: If archiving fails.
+            new_champion_version (str): The version of the new model being promoted.
         """
         try:
-            production_models: List[ModelVersion] = client.search_model_versions(
-                f"name='{model_name}' and tags.stage='Production'"
+            current_champion = client.get_model_version_by_alias(
+                name=model_name, alias="champion"
             )
-
-            if not production_models:
-                return
-
-            sorted_versions: List[ModelVersion] = sorted(
-                production_models, key=lambda v: int(v.version), reverse=True
-            )
-
-            for model in sorted_versions:
+            if current_champion and current_champion.version != new_champion_version:
                 client.set_model_version_tag(
                     name=model_name,
-                    version=model.version,
+                    version=current_champion.version,
                     key="stage",
                     value="Archived",
                 )
 
-        except Exception as e:
-            raise MyException(e, sys) from e
+                client.delete_registered_model_alias(name=model_name, alias="champion")
 
-    def promote_latest_model(self, model_name: str, client: MlflowClient) -> int:
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                client.update_model_version(
+                    name=model_name,
+                    version=current_champion.version,
+                    description=f"Archived on {current_time}",
+                )
+
+        except Exception:
+            logging.warning("Failed to archive current champion (likely none exists):")
+            pass
+
+    def promote_latest_model(self, model_name: str, client: MlflowClient) -> bool:
         """
-        Promotes the latest model version tagged 'Staging' to 'Production'.
-        If no model is 'Staging', it promotes the absolute latest version.
+        Promotes the model aliased as 'challenger' to 'champion'.
+
+        The process involves:
+        1. Identifying the model version with the 'challenger' alias.
+        2. Archiving the current 'champion' (if any) by setting a tag and updating its description.
+        3. Assigning the 'champion' alias to the new model.
+        4. Updating the new champion's description.
+        5. Removing the 'challenger' alias from the promoted model.
 
         Args:
             model_name (str): The name of the registered model.
             client (MlflowClient): The initialized MLflow client.
 
         Returns:
-            int: model version of the promoted model.
+            None
 
         Raises:
             MyException: If promotion fails.
         """
         try:
-            latest_model: Optional[ModelVersion] = None
+            target_model: Optional[ModelVersion] = None
 
-            staged_models: List[ModelVersion] = client.search_model_versions(
-                f"name='{model_name}' and tags.stage='Staging'"
+            is_challenger = False
+            try:
+                target_model = client.get_model_version_by_alias(
+                    name=model_name, alias="challenger"
+                )
+                is_challenger = True
+            except Exception:
+                target_model = None
+
+            if not target_model:
+                return False
+
+            logging.info("Archiving current champion...")
+            self._archive_current_champion(
+                model_name=model_name,
+                client=client,
+                new_champion_version=target_model.version,
             )
 
-            if staged_models:
-                sorted_versions: List[ModelVersion] = sorted(
-                    staged_models, key=lambda v: int(v.version), reverse=True
-                )
-                latest_model: ModelVersion = sorted_versions[0]
-
-            if latest_model:
-                model_version: str = latest_model.version
-                client.set_model_version_tag(
-                    name=model_name,
-                    version=model_version,
-                    key="stage",
-                    value="Production",
-                )
-                return latest_model.version
-
-            models: List[ModelVersion] = client.search_model_versions(
-                f"name='{model_name}'"
-            )
-            if not models:
-                return None
-
-            sorted_versions: List[ModelVersion] = sorted(
-                models, key=lambda v: int(v.version), reverse=True
+            client.set_registered_model_alias(
+                name=model_name,
+                version=target_model.version,
+                alias="champion",
             )
 
-            latest_model: ModelVersion = sorted_versions[0]
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            client.update_model_version(
+                name=model_name,
+                version=target_model.version,
+                description=f"Promoted to champion on {current_time}",
+            )
 
-            if latest_model:
-                model_version: str = latest_model.version
-                client.set_model_version_tag(
-                    name=model_name,
-                    version=model_version,
-                    key="stage",
-                    value="Production",
+            if is_challenger:
+                client.delete_registered_model_alias(
+                    name=model_name, alias="challenger"
                 )
-                return model_version
-            return -1
+
+            return True
 
         except Exception as e:
             raise MyException(e, sys) from e
@@ -218,13 +226,15 @@ class ModelPromotion:
                 dagshub_uri=dagshub_uri,
             )
 
-            logging.info("Archiving existing production models...")
-            self._archive_production_models(model_name=model_name, client=mlflow_client)
-
             logging.info("Promoting latest model...")
-            self.promote_latest_model(model_name=model_name, client=mlflow_client)
+            status = self.promote_latest_model(
+                model_name=model_name, client=mlflow_client
+            )
 
-            logging.info("Model Promotion complete.")
+            if status:
+                logging.info("Model Promotion complete.")
+            else:
+                logging.warning("Model Promotion Aborted, no 'challenger' model found")
 
         except Exception as e:
             raise MyException(e, sys) from e

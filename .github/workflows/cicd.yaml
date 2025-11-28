@@ -54,6 +54,7 @@ jobs:
 
   build:
     needs: test
+    if: false
     runs-on: ubuntu-latest
 
     steps:
@@ -110,6 +111,7 @@ jobs:
 
   deploy:
     needs: build
+    if: false
     runs-on: ubuntu-latest
 
     steps:

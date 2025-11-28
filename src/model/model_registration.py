@@ -3,6 +3,7 @@ import sys
 import json
 import mlflow
 import dagshub
+from datetime import datetime
 from typing import Dict
 from dotenv import load_dotenv
 from src.logger import logging
@@ -135,11 +136,57 @@ class ModelRegistration:
 
             client: MlflowClient = mlflow.tracking.MlflowClient()
 
-            client.set_model_version_tag(
+            tags = {
+                "app": "Doxa",
+                "author": "sarveshmhadgut",
+            }
+
+            for key, value in tags.items():
+                client.set_model_version_tag(
+                    name=model_name,
+                    version=registered_model.version,
+                    key=key,
+                    value=value,
+                )
+
+            try:
+                old_challenger = client.get_model_version_by_alias(
+                    name=model_name, alias="challenger"
+                )
+            except Exception:
+                old_challenger = None
+
+            if old_challenger:
+                client.set_model_version_tag(
+                    name=model_name,
+                    version=old_challenger.version,
+                    key="stage",
+                    value="Suspended",
+                )
+
+                client.delete_registered_model_alias(
+                    name=model_name, alias="challenger"
+                )
+                client.set_registered_model_alias(
+                    name=model_name, version=old_challenger.version, alias="suspended"
+                )
+
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                client.update_model_version(
+                    name=model_name,
+                    version=old_challenger.version,
+                    description=f"Suspended on {current_time}",
+                )
+
+            client.set_registered_model_alias(
+                name=model_name, version=registered_model.version, alias="challenger"
+            )
+
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            client.update_model_version(
                 name=model_name,
                 version=registered_model.version,
-                key="stage",
-                value="Staging",
+                description=f"Added as challenger on {current_time}",
             )
 
         except Exception as e:
