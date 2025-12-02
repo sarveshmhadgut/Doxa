@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered sentiment analysis tool for analyzing text emotions">
+    <title>Doxa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="{{ url_for('static', path='css/style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="main-title">
+            <span style="-webkit-text-fill-color: #79d2ff;">Doxa</span> : <span
+                style="-webkit-text-fill-color: #FFE699;">Sentiment Classifier</span>
+        </h1>
+
+        <br>
+        <form action="/predict" method="POST">
+            <div>
+                <label for="text" class="textarea-label">Spill the tea:</label>
+                <textarea id="text" name="text" rows="6" placeholder="" required
+                    aria-label="Text input for sentiment analysis"></textarea>
+            </div>
+
+            <button type="submit">Analyze Sentiment</button>
+        </form>
+
+        {% if result is not none %}
+        <div class="result {% if result == 1 %}positive{% else %}negative{% endif %}">
+            <img src="{% if result == 1 %}{{ url_for('static', path='homer_from_the_bush.gif') }}{% else %}{{ url_for('static', path='homer_into_bush.gif') }}{% endif %}"
+                alt="Sentiment Result GIF" class="result-gif">
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>

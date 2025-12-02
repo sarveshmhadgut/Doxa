@@ -24,7 +24,7 @@ End-to-end MLOps pipeline for IMDb sentiment classification, incorporating data 
 - **Cloud Deployment**: AWS EKS (Kubernetes) for scalable application deployment
 - **Containerization**: Portable builds using Docker
 - **Monitoring**: Real-time monitoring with Prometheus and Grafana on AWS EC2
-- **Prediction API**: Flask web service for inference
+- **Prediction API**: Flask or FastAPI web service for inference
 
 ## Tech Stack
 
@@ -36,7 +36,7 @@ End-to-end MLOps pipeline for IMDb sentiment classification, incorporating data 
 | Experiment Tracking | MLflow, Dagshub                  |
 | Cloud Services   | AWS (S3, EC2, ECR, EKS, IAM)        |
 | CI/CD            | GitHub Actions, Docker              |
-| Web Framework    | Flask                               |
+| Web Framework    | Flask / FastAPI                     |
 | Monitoring       | Prometheus, Grafana                 |
 | Development      | uv / pip                            |
 
@@ -50,7 +50,8 @@ doxa/
 ├── app/
 │   ├── static/
 │   ├── templates/
-│   └── app.py
+│   ├── app.py
+│   └── main.py
 ├── data/
 │   ├── interim/
 │   ├── processed/
@@ -220,7 +221,15 @@ python main.py
 **Locally:**
 
 ```bash
+**FastAPI (Recommended):**
+```bash
+uv run app/main.py
+```
+
+**Flask:**
+```bash
 uv run app/app.py
+```
 ```
 
 Access at `http://localhost:8080/`

@@ -30,4 +30,4 @@ COPY app/ .
 
 EXPOSE 8080
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--timeout", "120", "app:app"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

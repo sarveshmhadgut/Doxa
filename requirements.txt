@@ -234,3 +234,4 @@ yarl
 zc-lockfile
 zipp
 -e .
+python-multipart
